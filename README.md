@@ -1,6 +1,6 @@
 # clockpath
 
-A new Flutter project for clockpath.
+A new Flutter project.
 
 ## Getting Started
 
