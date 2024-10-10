@@ -36,7 +36,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // Validate and Sign Up
   void proceed() {
     if (_formKey.currentState?.validate() ?? false) {
-      Get.offAll(() => const OneTimeOtpScreen());
+      Get.to(() => const OneTimeOtpScreen());
     }
   }
 
@@ -50,7 +50,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           icon: Icon(Icons.arrow_back_ios,
               color: GlobalColors.textblackBoldColor),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
           },
         ),
       ),

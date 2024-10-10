@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_dropdow.dart';
+import 'package:clockpath/views/set_up_profile_screen/reminder_preference_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WorkingDaysScreen extends StatefulWidget {
@@ -16,6 +18,25 @@ class WorkingDaysScreen extends StatefulWidget {
 
 class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
   bool _isExpanded = false;
+  String mondayStart = '',
+      tuesdayStart = '',
+      wednessadyStart = '',
+      thursdayStart = '',
+      saturdayStart = '',
+      sundayStart = '',
+      fridayStart = '',
+      mondayEnd = '',
+      tuesdayEnd = '',
+      wednessadyEnd = '',
+      thursdayEnd = '',
+      saturdayEnd = '',
+      sundayEnd = '',
+      fridayEnd = '';
+  // Validate and Sign Up
+  void proceed() {
+    Get.to(() => const ReminderPreferenceScreen());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +47,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
           icon: Icon(Icons.arrow_back_ios,
               color: GlobalColors.textblackBoldColor),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
           },
         ),
       ),
@@ -99,6 +120,9 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      setState(() {
+                                        mondayStart = value!;
+                                      });
                                     },
                                   ),
                                 ),
@@ -122,6 +146,9 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      setState(() {
+                                        mondayEnd = value!;
+                                      });
                                     },
                                   ),
                                 ),
@@ -177,6 +204,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      tuesdayStart = value!;
                                     },
                                   ),
                                 ),
@@ -200,6 +228,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      tuesdayEnd = value!;
                                     },
                                   ),
                                 ),
@@ -255,6 +284,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      wednessadyStart = value!;
                                     },
                                   ),
                                 ),
@@ -278,6 +308,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      wednessadyEnd = value!;
                                     },
                                   ),
                                 ),
@@ -333,6 +364,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      thursdayStart = value!;
                                     },
                                   ),
                                 ),
@@ -356,6 +388,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      thursdayEnd = value!;
                                     },
                                   ),
                                 ),
@@ -411,6 +444,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      fridayStart = value!;
                                     },
                                   ),
                                 ),
@@ -434,6 +468,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      fridayEnd = value!;
                                     },
                                   ),
                                 ),
@@ -489,6 +524,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      saturdayStart = value!;
                                     },
                                   ),
                                 ),
@@ -512,6 +548,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      saturdayEnd = value!;
                                     },
                                   ),
                                 ),
@@ -567,6 +604,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '08:00 AM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      sundayStart = value!;
                                     },
                                   ),
                                 ),
@@ -590,6 +628,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                                         '05:00 PM', // Initial selected value
                                     onChanged: (value) {
                                       log('Selected: $value');
+                                      saturdayEnd = value!;
                                     },
                                   ),
                                 ),
@@ -609,9 +648,7 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: CustomButton(
-                      onTap: () {
-                        log('no');
-                      },
+                      onTap: proceed,
                       decorationColor: GlobalColors.kDeepPurple,
                       text: 'Save and Continue',
                       textColor: GlobalColors.textWhiteColor),

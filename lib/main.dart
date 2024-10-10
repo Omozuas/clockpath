@@ -1,7 +1,6 @@
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/config/permission_handuler.dart';
-import 'package:clockpath/views/set_up_profile_screen/set_up_profile_screen.dart';
-// import 'package:clockpath/views/splash_screen/splash_screen.dart';
+import 'package:clockpath/views/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -47,4 +46,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Widget start = const SetUpProfileScreen();
+Widget start = const SplashScreen();

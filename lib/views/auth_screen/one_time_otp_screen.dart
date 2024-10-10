@@ -53,7 +53,7 @@ class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
           icon: Icon(Icons.arrow_back_ios,
               color: GlobalColors.textblackBoldColor),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
           },
         ),
       ),
