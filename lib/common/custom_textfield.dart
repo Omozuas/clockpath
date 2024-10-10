@@ -5,24 +5,34 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextFields extends StatelessWidget {
-  const CustomTextFields(
-      {super.key,
-      required this.firstText,
-      required this.hintText,
-      this.keyboardType,
-      required this.controller,
-      this.suffixIcon,
-      this.inputFormatters,
-      this.validator,
-      this.obscureText = false});
-  final String firstText, hintText;
+  const CustomTextFields({
+    super.key,
+    required this.firstText,
+    required this.hintText,
+    this.keyboardType,
+    required this.controller,
+    this.suffixIcon,
+    this.inputFormatters,
+    this.validator,
+    this.obscureText = false,
+    this.onForgotPassword,
+    this.autofocus = false,
+    this.onChanged,
+    this.maxLengthEnforcement,
+    this.contentPadding,
+    this.extraText, // Optional callback for "Forgot Password?"
+  });
+  final String? firstText, hintText, extraText;
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
   final Widget? suffixIcon;
   final TextInputType? keyboardType;
-  final bool obscureText;
-
+  final bool obscureText, autofocus;
+  final VoidCallback? onForgotPassword; // Callback for when the link is tapped
+  final Function(String)? onChanged;
+  final MaxLengthEnforcement? maxLengthEnforcement;
+  final EdgeInsetsGeometry? contentPadding;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -30,7 +40,7 @@ class CustomTextFields extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          firstText,
+          firstText ?? '',
           style: GoogleFonts.openSans(
             color: GlobalColors.textblackBoldColor,
             fontSize: 16.sp,
@@ -38,29 +48,47 @@ class CustomTextFields extends StatelessWidget {
           ),
         ),
         SizedBox(height: 10.h),
-        SizedBox(
-          height: 80.h,
-          child: TextFormField(
-            controller: controller,
-            validator: validator,
-            inputFormatters: inputFormatters,
-            keyboardType: keyboardType,
-            obscureText: obscureText,
-            decoration: InputDecoration(
-              suffixIcon: suffixIcon,
-              hintText: hintText,
-              hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: GlobalColors.textblackSmallColor,
-                  ),
-              contentPadding: const EdgeInsets.all(20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16.r),
-                borderSide:
-                    const BorderSide(color: Color(0xffBBC0C3), width: 1),
-              ),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          autofocus: autofocus,
+          inputFormatters: inputFormatters,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          onChanged: onChanged,
+          maxLengthEnforcement: maxLengthEnforcement,
+          decoration: InputDecoration(
+            suffixIcon: suffixIcon,
+            hintText: hintText,
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: GlobalColors.textblackSmallColor,
+                ),
+            contentPadding: contentPadding ??
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16.r),
+              borderSide: const BorderSide(color: Color(0xffBBC0C3), width: 1),
             ),
           ),
         ),
+        if (onForgotPassword != null) // Only show if the callback is provided
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: InkWell(
+                onTap: onForgotPassword,
+                child: Text(
+                  extraText ?? '',
+                  style: GoogleFonts.openSans(
+                    color: GlobalColors.kDeepPurple,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

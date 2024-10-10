@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/views/auth_screen/forgot_password_screen.dart';
+import 'package:clockpath/views/set_up_profile_screen/set_up_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,32 +22,45 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final _codeController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isButtonEnabled = false;
-
+  bool _isPasswordObscured = true;
   @override
   void initState() {
     super.initState();
     // Listen to changes in both TextEditingControllers
     _emailController.addListener(_checkFormValidity);
-    _codeController.addListener(_checkFormValidity);
+    _passwordController.addListener(_checkFormValidity);
   }
 
   @override
   void dispose() {
     _emailController.dispose();
-    _codeController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordObscured = !_isPasswordObscured;
+    });
   }
 
   // Check if both fields are not empty
   void _checkFormValidity() {
     final isEmailNotEmpty = _emailController.text.isNotEmpty;
-    final isCodeNotEmpty = _codeController.text.isNotEmpty;
+    final isCodeNotEmpty = _passwordController.text.isNotEmpty;
 
     setState(() {
       _isButtonEnabled = isEmailNotEmpty && isCodeNotEmpty;
     });
+  }
+
+  // Validate and Sign Up
+  void login() {
+    if (_formKey.currentState?.validate() ?? false) {
+      Get.offAll(() => const SetUpProfileScreen());
+    }
   }
 
   @override
@@ -65,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: 357.w,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
                           children: [
                             SvgPicture.asset(
@@ -75,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             SizedBox(height: 40.h),
                             Text(
-                              'Welcome to ClockPath',
+                              'Welcome Back!',
                               style: GoogleFonts.playfairDisplay(
                                 color: GlobalColors.textblackBoldColor,
                                 fontSize: 24.sp,
@@ -84,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             SizedBox(height: 10.h),
                             Text(
-                              'Enter your email and invitation code to get started',
+                              'Log in to access your account and manage your time with ClockPath',
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: GoogleFonts.openSans(
@@ -119,36 +135,46 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 20.h),
                     CustomTextFields(
-                      controller: _codeController,
-                      firstText: 'Invitation Code',
+                      controller: _passwordController,
+                      firstText: 'Password',
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your Code';
+                          return 'Please enter your  Password';
                         }
+
                         return null;
                       },
-                      hintText: 'Enter code',
-                      keyboardType: TextInputType.number,
+                      hintText: 'Password',
+                      obscureText: _isPasswordObscured,
                       inputFormatters: [
                         FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                        FilteringTextInputFormatter.deny(RegExp(r',')),
                       ],
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordObscured
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: _togglePasswordVisibility,
+                      ),
+                      onForgotPassword: () {
+                        Get.to(() => const ForgotPasswordScreen());
+                      },
+                      extraText: 'Forgot Password?',
                     ),
-                    SizedBox(height: 80.h),
+                    SizedBox(height: 50.h),
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: CustomButton(
                         onTap: _isButtonEnabled
-                            ? () {
-                                log('yes');
-                              }
+                            ? login
                             : () {
                                 log('no');
                               },
                         decorationColor: _isButtonEnabled
                             ? GlobalColors.kDeepPurple
                             : GlobalColors.kLightpPurple,
-                        text: 'Verify',
+                        text: 'Login',
                         textColor: _isButtonEnabled
                             ? GlobalColors.textWhiteColor
                             : GlobalColors.kDLightpPurple,

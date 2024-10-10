@@ -9,4 +9,5 @@ class GlobalColors {
   static HexColor textblackSmallColor = HexColor('#5C5C5C');
   static HexColor textWhiteColor = HexColor('#FFFFFF');
   static HexColor lightGrayeColor = HexColor('#CCCCCC');
+  static HexColor lightBlueColor = HexColor('##F1F1F1');
 }

@@ -1,6 +1,6 @@
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
-import 'package:clockpath/views/auth_screen/create_password.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -57,10 +57,10 @@ class PasswordSuccesScreen extends StatelessWidget {
                         alignment: Alignment.bottomCenter,
                         child: CustomButton(
                             onTap: () {
-                              Get.offAll(() => const CreatePasswordScreen());
+                              Get.offAll(() => const LoginScreen());
                             },
                             decorationColor: GlobalColors.kDeepPurple,
-                            text: 'Create Password',
+                            text: 'Login',
                             textColor: GlobalColors.textWhiteColor),
                       ),
                     ],
