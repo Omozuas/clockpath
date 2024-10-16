@@ -7,47 +7,50 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class OnbooardingScreen extends StatefulWidget {
-  const OnbooardingScreen({super.key});
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
 
   @override
-  State<OnbooardingScreen> createState() => _OnbooardingScreenState();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnbooardingScreenState extends State<OnbooardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GlobalColors.textWhiteColor,
       body: Padding(
-        padding:
-            const EdgeInsets.only(top: 15.0, left: 15, right: 15, bottom: 15),
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              height: 430.h,
+              height: 0.6.sh, // Responsive height (50% of screen height)
               child: Center(
                 child: PageView(
                   controller: _controller,
                   children: const [
                     OnboardingDetails(
-                        imagAsset: 'assets/images/img1.png',
-                        mainText: 'Welcome to ClockPath',
-                        subText:
-                            'Efficient time tracking and management made easy. Get started by setting up your work schedule and preferences'),
+                      imagAsset: 'assets/images/img1.png',
+                      mainText: 'Welcome to ClockPath',
+                      subText:
+                          'Efficient time tracking and management made easy. Get started by setting up your work schedule and preferences',
+                    ),
                     OnboardingDetails(
-                        imagAsset: 'assets/images/img2.png',
-                        mainText: 'Customize Your Work Week',
-                        subText:
-                            'Update your workdays and hours to match your schedule. We’ll help you stay organized and on track'),
+                      imagAsset: 'assets/images/img2.png',
+                      mainText: 'Customize Your Work Week',
+                      subText:
+                          'Update your workdays and hours to match your schedule. We’ll help you stay organized and on track',
+                    ),
                     OnboardingDetails(
-                        imagAsset: 'assets/images/img3.png',
-                        mainText: 'Stay On Time',
-                        subText:
-                            ' Set your reminder preferences to get timely notifications for clocking in and out. Never miss a beat!'),
+                      imagAsset: 'assets/images/img3.png',
+                      mainText: 'Stay On Time',
+                      subText:
+                          'Set your reminder preferences to get timely notifications for clocking in and out. Never miss a beat!',
+                    ),
                   ],
                 ),
               ),
@@ -74,7 +77,7 @@ class _OnbooardingScreenState extends State<OnbooardingScreen> {
                     borderRadius: BorderRadius.circular(16.r),
                     verticalOffset: 0,
                   ),
-                  spacing: 6.0,
+                  spacing: 6.w, // Responsive spacing
                 ),
               ),
             ),

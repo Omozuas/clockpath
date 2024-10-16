@@ -22,6 +22,7 @@ class OnboardingDetails extends StatelessWidget {
         SizedBox(height: 20.h),
         Text(
           mainText,
+          textAlign: TextAlign.center,
           style: GoogleFonts.playfairDisplay(
             color: GlobalColors.textblackBoldColor,
             fontSize: 24.sp,

@@ -16,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final controller = Get.put(MainController());
     return Scaffold(
-      backgroundColor: GlobalColors.textWhiteColor,
+      backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(
         child: Obx(
           // Only the screen that depends on the observable index is wrapped in Obx
@@ -26,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: Obx(
         // Wrap only the BottomNavigationBar that depends on the mainIndex observable
         () => BottomNavigationBar(
-          backgroundColor: GlobalColors.textWhiteColor,
+          backgroundColor: GlobalColors.backgroundColor2,
           selectedItemColor: GlobalColors.kDeepPurple,
           elevation: 0,
           unselectedItemColor: GlobalColors.grayColor,

@@ -22,7 +22,7 @@ class PasswordSuccesScreen extends StatelessWidget {
               SizedBox(
                 width: 357.w,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     children: [
                       SvgPicture.asset(
@@ -33,6 +33,8 @@ class PasswordSuccesScreen extends StatelessWidget {
                       SizedBox(height: 40.h),
                       Text(
                         'Password Set Successfully!',
+                        textAlign: TextAlign.center,
+                        softWrap: true,
                         style: GoogleFonts.playfairDisplay(
                           color: GlobalColors.textblackBoldColor,
                           fontSize: 24.sp,

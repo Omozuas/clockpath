@@ -76,6 +76,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         SizedBox(height: 40.h),
                         Text(
+                          textAlign: TextAlign.center,
+                          softWrap: true,
                           'Forgot Your Password?',
                           style: GoogleFonts.playfairDisplay(
                             color: GlobalColors.textblackBoldColor,

@@ -72,37 +72,34 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     SizedBox(
                       width: 357.w,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/logo/mainlogo.svg',
-                              width: 56.w,
-                              height: 56.h,
+                      child: Column(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/logo/mainlogo.svg',
+                            width: 56.w,
+                            height: 56.h,
+                          ),
+                          SizedBox(height: 40.h),
+                          Text(
+                            'Welcome to ClockPath',
+                            style: GoogleFonts.playfairDisplay(
+                              color: GlobalColors.textblackBoldColor,
+                              fontSize: 24.sp,
+                              fontWeight: FontWeight.w700,
                             ),
-                            SizedBox(height: 40.h),
-                            Text(
-                              'Welcome to ClockPath',
-                              style: GoogleFonts.playfairDisplay(
-                                color: GlobalColors.textblackBoldColor,
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.w700,
-                              ),
+                          ),
+                          SizedBox(height: 10.h),
+                          Text(
+                            'Enter your email and invitation code to get started',
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            style: GoogleFonts.openSans(
+                              color: GlobalColors.textblackBoldColor,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w400,
                             ),
-                            SizedBox(height: 10.h),
-                            Text(
-                              'Enter your email and invitation code to get started',
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              style: GoogleFonts.openSans(
-                                color: GlobalColors.textblackBoldColor,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 30.h),
