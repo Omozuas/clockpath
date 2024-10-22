@@ -20,6 +20,8 @@ class CustomTextFields extends StatelessWidget {
     this.onChanged,
     this.maxLengthEnforcement,
     this.contentPadding,
+    this.maxLength,
+    this.maxLines = 1,
     this.extraText, // Optional callback for "Forgot Password?"
   });
   final String? firstText, hintText, extraText;
@@ -33,6 +35,7 @@ class CustomTextFields extends StatelessWidget {
   final Function(String)? onChanged;
   final MaxLengthEnforcement? maxLengthEnforcement;
   final EdgeInsetsGeometry? contentPadding;
+  final int? maxLength, maxLines;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -52,6 +55,8 @@ class CustomTextFields extends StatelessWidget {
           controller: controller,
           validator: validator,
           autofocus: autofocus,
+          maxLength: maxLength,
+          maxLines: maxLines,
           inputFormatters: inputFormatters,
           keyboardType: keyboardType,
           obscureText: obscureText,

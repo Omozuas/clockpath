@@ -4,18 +4,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomDropdownField extends StatefulWidget {
-  const CustomDropdownField({
-    super.key,
-    required this.firstText,
-    required this.hintText,
-    required this.items, // List of items for dropdown
-    this.onChanged,
-    this.validator,
-    this.initialValue,
-    this.suffixIcon,
-    this.extraText,
-    this.onForgotPassword,
-  });
+  const CustomDropdownField(
+      {super.key,
+      required this.firstText,
+      required this.hintText,
+      required this.items, // List of items for dropdown
+      this.onChanged,
+      this.validator,
+      this.initialValue,
+      this.suffixIcon,
+      this.extraText,
+      this.onForgotPassword,
+      this.contentPadding});
 
   final String? firstText, hintText, extraText;
   final List<String> items; // List of dropdown items
@@ -24,6 +24,7 @@ class CustomDropdownField extends StatefulWidget {
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
   final VoidCallback? onForgotPassword;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   CustomDropdownFieldState createState() => CustomDropdownFieldState();
@@ -77,8 +78,8 @@ class CustomDropdownFieldState extends State<CustomDropdownField> {
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: GlobalColors.textblackSmallColor,
                 ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            contentPadding: widget.contentPadding ??
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.r),
               borderSide:

@@ -1,5 +1,6 @@
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/controller/main_controller/main_controller.dart';
+import 'package:clockpath/views/requests/new_request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -23,12 +24,28 @@ class _MainScreenState extends State<MainScreen> {
           () => controller.screens[controller.mainIndex.value],
         ),
       ),
+      floatingActionButton: Obx(
+        // Wrap FAB inside Obx to reactively show/hide it based on mainIndex
+        () => controller.mainIndex.value == 2
+            ? FloatingActionButton(
+                shape: const CircleBorder(),
+                onPressed: () {
+                  // Add your onPressed code here!
+                  Get.to(() => const NewRequest());
+                },
+                backgroundColor: GlobalColors.kDeepPurple,
+                child: SvgPicture.asset('assets/icons/edit2.svg'),
+              )
+            : Container(),
+      ), // Hide FAB for other screens
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: Obx(
         // Wrap only the BottomNavigationBar that depends on the mainIndex observable
         () => BottomNavigationBar(
           backgroundColor: GlobalColors.backgroundColor2,
           selectedItemColor: GlobalColors.kDeepPurple,
           elevation: 0,
+
           unselectedItemColor: GlobalColors.grayColor,
           type: BottomNavigationBarType.fixed,
           currentIndex:

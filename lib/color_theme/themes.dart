@@ -13,4 +13,10 @@ class GlobalColors {
   static HexColor grayColor = HexColor('#4D4D4D');
   static HexColor backgroundColor1 = HexColor('#FDF9F1');
   static HexColor backgroundColor2 = HexColor('#FFFEFC');
+  static HexColor deepGreen = HexColor('#00A354');
+  static HexColor lightGreen = HexColor('#E6FDF1');
+  static HexColor deepyello = HexColor('#E8A746');
+  static HexColor lightyellow = HexColor('#FFE9C8');
+  static HexColor deepred = HexColor('#C02B2B');
+  static HexColor lightred = HexColor('#FFEEEE');
 }
