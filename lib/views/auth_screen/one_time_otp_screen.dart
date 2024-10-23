@@ -105,8 +105,8 @@ class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
                       return SizedBox(
                         width: 50.w,
                         child: CustomTextFields(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 17, vertical: 20),
+                          contentPadding: EdgeInsets.only(
+                              top: 10.h, bottom: 10.h, left: 15.w, right: 15.w),
                           firstText: '',
                           autofocus: index == 0,
                           controller: _otpControllers[index],

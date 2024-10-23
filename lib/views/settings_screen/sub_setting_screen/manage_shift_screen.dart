@@ -3,20 +3,20 @@ import 'dart:developer';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_dropdow.dart';
-import 'package:clockpath/views/set_up_profile_screen/reminder_preference_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class WorkingDaysScreen extends StatefulWidget {
-  const WorkingDaysScreen({super.key});
+class ManageShiftScreen extends StatefulWidget {
+  const ManageShiftScreen({super.key});
 
   @override
-  State<WorkingDaysScreen> createState() => _WorkingDaysScreenState();
+  State<ManageShiftScreen> createState() => _ManageShiftScreenState();
 }
 
-class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
+class _ManageShiftScreenState extends State<ManageShiftScreen> {
   bool _isExpanded = false;
   String mondayStart = '',
       tuesdayStart = '',
@@ -32,10 +32,6 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
       saturdayEnd = '',
       sundayEnd = '',
       fridayEnd = '';
-  // Validate and Sign Up
-  void proceed() {
-    Get.to(() => const ReminderPreferenceScreen());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,35 +45,39 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios,
-                        color: GlobalColors.textblackBoldColor),
-                    onPressed: () {
-                      Get.back();
-                    },
+                  GestureDetector(
+                      onTap: () => Get.back(),
+                      child: SvgPicture.asset('assets/icons/backIcon.svg')),
+                  Flexible(
+                    child: SizedBox(
+                      width: 80.w,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      'Manage Shifts',
+                      style: GoogleFonts.playfairDisplay(
+                        color: GlobalColors.textblackBoldColor,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 30.h,
               ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Work Days',
-                        style: GoogleFonts.playfairDisplay(
-                          color: GlobalColors.textblackBoldColor,
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      Text(
-                        'Review and confirm your shift times for each workday to ensure accurate time tracking',
-                        textAlign: TextAlign.center,
+                        'Customize your shift times for each workday to match your schedule',
+                        textAlign: TextAlign.start,
                         softWrap: true,
                         style: GoogleFonts.openSans(
                           color: GlobalColors.textblackSmallColor,
@@ -667,9 +667,9 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: CustomButton(
-                            onTap: proceed,
+                            onTap: () {},
                             decorationColor: GlobalColors.kDeepPurple,
-                            text: 'Save and Continue',
+                            text: 'Save Changes',
                             textColor: GlobalColors.textWhiteColor),
                       ),
                     ],

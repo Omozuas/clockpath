@@ -134,9 +134,6 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                       },
                       hintText: 'New Password',
                       obscureText: _isPasswordObscured,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                      ],
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured
@@ -160,9 +157,6 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                         return null;
                       },
                       hintText: 'Enter Confirm Password',
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                      ],
                       obscureText: _isConfirmPasswordObscured,
                       suffixIcon: IconButton(
                         icon: Icon(

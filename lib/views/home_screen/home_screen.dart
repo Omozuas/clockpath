@@ -1,6 +1,7 @@
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_bottomsheet.dart';
 import 'package:clockpath/common/custom_button.dart';
+import 'package:clockpath/views/settings_screen/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -78,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => Get.to(() => const SettingsScreen()),
                       child: SvgPicture.asset(
                         'assets/icons/settings.svg',
                         width: 32.w,

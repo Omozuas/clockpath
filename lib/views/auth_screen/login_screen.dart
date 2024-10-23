@@ -146,9 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       hintText: 'Password',
                       obscureText: _isPasswordObscured,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                      ],
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured

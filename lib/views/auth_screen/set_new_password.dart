@@ -129,9 +129,6 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                       },
                       hintText: 'New Password',
                       obscureText: _isPasswordObscured,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                      ],
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured
@@ -155,9 +152,6 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                         return null;
                       },
                       hintText: 'Enter Confirm Password',
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                      ],
                       obscureText: _isConfirmPasswordObscured,
                       suffixIcon: IconButton(
                         icon: Icon(

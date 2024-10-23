@@ -1,28 +1,24 @@
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_dropdow.dart';
-import 'package:clockpath/views/main_screen/main_screen.dart';
-import 'package:clockpath/views/set_up_profile_screen/location_permission_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ReminderPreferenceScreen extends StatefulWidget {
-  const ReminderPreferenceScreen({super.key});
+class ReminderScreen extends StatefulWidget {
+  const ReminderScreen({super.key});
 
   @override
-  State<ReminderPreferenceScreen> createState() =>
-      _ReminderPreferenceScreenState();
+  State<ReminderScreen> createState() => _ReminderScreenState();
 }
 
-class _ReminderPreferenceScreenState extends State<ReminderPreferenceScreen> {
+class _ReminderScreenState extends State<ReminderScreen> {
   String? clockInReminder;
   String? clockOutReminder;
 
-  void proceed() {
-    Get.to(() => const LocationPermissionScreen());
-  }
+  void proceed() {}
 
   // Function to check if both dropdowns are selected
   bool areBothDropdownsSelected() {
@@ -39,54 +35,40 @@ class _ReminderPreferenceScreenState extends State<ReminderPreferenceScreen> {
       body: SafeArea(
           child: Padding(
         padding:
-            EdgeInsets.only(bottom: 20.h, left: 20.w, right: 20.w, top: 10.h),
+            EdgeInsets.only(top: 10.h, bottom: 20.h, right: 20.w, left: 20.w),
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios,
-                      color: GlobalColors.textblackBoldColor),
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
                 GestureDetector(
-                  onTap: () => Get.offAll(() => const MainScreen()),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
-                    child: Text(
-                      'Skip',
-                      softWrap: true,
-                      style: GoogleFonts.openSans(
-                        color: GlobalColors.kDeepPurple,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    onTap: () => Get.back(),
+                    child: SvgPicture.asset('assets/icons/backIcon.svg')),
+                Flexible(
+                  child: SizedBox(
+                    width: 45.w,
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    'Reminder Preferences',
+                    style: GoogleFonts.playfairDisplay(
+                      color: GlobalColors.textblackBoldColor,
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                )
+                ),
               ],
             ),
+            SizedBox(height: 30.h),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Reminder Preferences',
-                      style: GoogleFonts.playfairDisplay(
-                        color: GlobalColors.textblackBoldColor,
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Text(
                       'Set your reminder preferences to get notified before clocking in and out',
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.start,
                       softWrap: true,
                       style: GoogleFonts.openSans(
                         color: GlobalColors.textblackSmallColor,
@@ -94,7 +76,16 @@ class _ReminderPreferenceScreenState extends State<ReminderPreferenceScreen> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    SizedBox(height: 30.h),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Divider(
+                      thickness: 1,
+                      color: GlobalColors.lightGrayeColor,
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
                     CustomDropdownField(
                       firstText: 'Clock In Reminder',
                       hintText: 'Select time interval',
@@ -113,7 +104,7 @@ class _ReminderPreferenceScreenState extends State<ReminderPreferenceScreen> {
                       },
                     ),
                     SizedBox(
-                      height: 30.h,
+                      height: 20.h,
                     ),
                     CustomDropdownField(
                       firstText: 'Clock Out Reminder',
@@ -132,27 +123,19 @@ class _ReminderPreferenceScreenState extends State<ReminderPreferenceScreen> {
                         });
                       },
                     ),
-                    SizedBox(height: 40.h),
-
-                    // Conditionally show the button if both dropdowns are selected
-
+                    SizedBox(height: 60.h),
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: CustomButton(
-                        onTap: areBothDropdownsSelected() ? proceed : () {},
-                        decorationColor: areBothDropdownsSelected()
-                            ? GlobalColors.kDeepPurple
-                            : GlobalColors.kLightpPurple,
-                        text: 'Save and Continue',
-                        textColor: areBothDropdownsSelected()
-                            ? GlobalColors.textWhiteColor
-                            : GlobalColors.kDLightpPurple,
-                      ),
+                          onTap: () {},
+                          decorationColor: GlobalColors.kDeepPurple,
+                          text: 'Save Changes',
+                          textColor: GlobalColors.textWhiteColor),
                     ),
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       )),

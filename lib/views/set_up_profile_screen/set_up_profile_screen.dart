@@ -11,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SetUpProfileScreen extends StatefulWidget {
   const SetUpProfileScreen({super.key});
@@ -68,6 +69,18 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
   void proceed() {
     if (_formKey.currentState?.validate() ?? false) {
       Get.to(() => const WorkingDaysScreen());
+    }
+  }
+
+  // Function to request permission and handle denied/approved cases
+  Future<void> _checkPermissionAndPickImage() async {
+    PermissionStatus status = await Permission.storage.status;
+
+    if (status.isGranted) {
+      _pickImage(); // Permission is already granted, pick the image
+    } else {
+      await Permission.storage.request(); // Request permission
+      _pickImage(); // Then pick the image
     }
   }
 
@@ -134,7 +147,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                           bottom: 0,
                           right: 0,
                           child: GestureDetector(
-                            onTap: _pickImage,
+                            onTap: _checkPermissionAndPickImage,
                             child: Container(
                               height: 32.h,
                               width: 32.w,

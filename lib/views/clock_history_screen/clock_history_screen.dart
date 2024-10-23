@@ -46,6 +46,7 @@ class _ClockHistoryScreenState extends State<ClockHistoryScreen> {
       transitionDuration: const Duration(milliseconds: 200),
       barrierDismissible: true,
       theme: Theme.of(context).copyWith(
+        // ignore: deprecated_member_use
         useMaterial3: false,
         colorScheme: ColorScheme.light(
           primary: GlobalColors.kDeepPurple,
