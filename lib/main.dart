@@ -1,5 +1,5 @@
 import 'package:clockpath/color_theme/themes.dart';
-import 'package:clockpath/config/permission_handuler.dart';
+// import 'package:clockpath/config/permission_handuler.dart';
 import 'package:clockpath/views/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,8 +15,8 @@ Future<void> main() async {
       DeviceOrientation.portraitDown,
     ],
   );
-  PermissionsMethods permissionsMethods = PermissionsMethods();
-  await permissionsMethods.askCameraPermission();
+  // PermissionsMethods permissionsMethods = PermissionsMethods();
+  // await permissionsMethods.askCameraPermission();
   runApp(const MyApp());
 }
 
