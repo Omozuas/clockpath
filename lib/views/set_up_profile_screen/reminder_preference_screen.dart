@@ -39,35 +39,35 @@ class _ReminderPreferenceScreenState extends State<ReminderPreferenceScreen> {
       body: SafeArea(
           child: Padding(
         padding:
-            EdgeInsets.only(bottom: 20.h, left: 20.w, right: 20.w, top: 10.h),
+            EdgeInsets.only(bottom: 20.h, left: 20.w, right: 20.w, top: 20.h),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios,
+                InkWell(
+                  child: Icon(Icons.arrow_back_ios,
                       color: GlobalColors.textblackBoldColor),
-                  onPressed: () {
+                  onTap: () {
                     Get.back();
                   },
                 ),
                 GestureDetector(
                   onTap: () => Get.offAll(() => const MainScreen()),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
-                    child: Text(
-                      'Skip',
-                      softWrap: true,
-                      style: GoogleFonts.openSans(
-                        color: GlobalColors.kDeepPurple,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  child: Text(
+                    'Skip',
+                    softWrap: true,
+                    style: GoogleFonts.openSans(
+                      color: GlobalColors.kDeepPurple,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 )
               ],
+            ),
+            SizedBox(
+              height: 10.h,
             ),
             Expanded(
               child: SingleChildScrollView(

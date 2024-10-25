@@ -135,7 +135,8 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
       body: SafeArea(
           child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 20, left: 15, right: 15),
+          padding:
+              EdgeInsets.only(bottom: 20.h, left: 20.w, right: 20.w, top: 20.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,

@@ -45,16 +45,16 @@ class _WorkingDaysScreenState extends State<WorkingDaysScreen> {
           child: Center(
         child: Padding(
           padding:
-              EdgeInsets.only(bottom: 20.h, left: 20.w, right: 20.w, top: 10.h),
+              EdgeInsets.only(bottom: 20.h, left: 20.w, right: 20.w, top: 20.h),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios,
+                  InkWell(
+                    child: Icon(Icons.arrow_back_ios,
                         color: GlobalColors.textblackBoldColor),
-                    onPressed: () {
+                    onTap: () {
                       Get.back();
                     },
                   ),

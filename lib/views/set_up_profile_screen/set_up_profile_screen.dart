@@ -92,8 +92,8 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 20.0, right: 20, top: 20, bottom: 20),
+              padding: EdgeInsets.only(
+                  left: 20.w, right: 20.w, top: 20.h, bottom: 20.h),
               child: Form(
                 key: _formKey,
                 child: Column(

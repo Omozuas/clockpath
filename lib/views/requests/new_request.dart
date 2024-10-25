@@ -55,162 +55,171 @@ class _NewRequestState extends State<NewRequest> {
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(
-                top: 5.h, left: 15.w, right: 15.w, bottom: 10.h),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: SvgPicture.asset('assets/icons/close.svg'),
+        child: Padding(
+          padding:
+              EdgeInsets.only(top: 20.h, left: 20.w, right: 20.w, bottom: 20.h),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: SvgPicture.asset('assets/icons/close.svg'),
+                  ),
+                  SizedBox(width: 100.w),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'New Request',
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style: GoogleFonts.openSans(
+                        color: GlobalColors.textblackBoldColor,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    SizedBox(width: 50.w),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'New Request',
+                  )
+                ],
+              ),
+              SizedBox(height: 15.h),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Select the type of request and specify the dates to submit your time off',
                         textAlign: TextAlign.center,
                         softWrap: true,
                         style: GoogleFonts.openSans(
-                          color: GlobalColors.textblackBoldColor,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
+                          color: GlobalColors.textblackSmallColor,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                    )
-                  ],
-                ),
-                SizedBox(height: 15.h),
-                Text(
-                  'Select the type of request and specify the dates to submit your time off',
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: GoogleFonts.openSans(
-                    color: GlobalColors.textblackSmallColor,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Divider(
-                  color: GlobalColors.lightGrayeColor,
-                  thickness: 1.h,
-                ),
-                SizedBox(height: 20.h),
-                CustomDropdownField(
-                  firstText: 'Request Type',
-                  hintText: 'Select request type',
-                  items: const [
-                    'Select request type',
-                    '5 minutes before',
-                    '10 minutes before',
-                    '15 minutes before',
-                  ], // List of items in the dropdown
-                  initialValue: 'Select request type', // Initial selected value
-                  onChanged: (value) {
-                    setState(() {
-                      clockInReminder = value;
-                    });
-                  },
-                ),
-                SizedBox(height: 20.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: CustomDropdownField(
-                        firstText: 'Start Date',
-                        hintText: 'Select Date',
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 20),
+                      Divider(
+                        color: GlobalColors.lightGrayeColor,
+                        thickness: 1.h,
+                      ),
+                      SizedBox(height: 20.h),
+                      CustomDropdownField(
+                        firstText: 'Request Type',
+                        hintText: 'Select request type',
                         items: const [
-                          'Select Date',
+                          'Select request type',
                           '5 minutes before',
                           '10 minutes before',
                           '15 minutes before',
                         ], // List of items in the dropdown
-                        initialValue: 'Select Date', // Initial selected value
+                        initialValue:
+                            'Select request type', // Initial selected value
                         onChanged: (value) {
                           setState(() {
-                            clockOutReminder = value;
+                            clockInReminder = value;
                           });
                         },
                       ),
-                    ),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: CustomDropdownField(
-                        firstText: 'End Date',
-                        hintText: 'Select Date',
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 20),
-                        items: const [
-                          'Select Date',
-                          '5 minutes before',
-                          '10 minutes before',
-                          '15 minutes before',
-                        ], // List of items in the dropdown
-                        initialValue: 'Select Date', // Initial selected value
-                        onChanged: (value) {
-                          setState(() {
-                            clockInReminder1 = value;
-                          });
-                        },
+                      SizedBox(height: 20.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: CustomDropdownField(
+                              firstText: 'Start Date',
+                              hintText: 'Select Date',
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 5.w, vertical: 20.h),
+                              items: const [
+                                'Select Date',
+                                '5 minutes before',
+                                '10 minutes before',
+                                '15 minutes before',
+                              ], // List of items in the dropdown
+                              initialValue:
+                                  'Select Date', // Initial selected value
+                              onChanged: (value) {
+                                setState(() {
+                                  clockOutReminder = value;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: CustomDropdownField(
+                              firstText: 'End Date',
+                              hintText: 'Select Date',
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 5.w, vertical: 20.h),
+                              items: const [
+                                'Select Date',
+                                '5 minutes before',
+                                '10 minutes before',
+                                '15 minutes before',
+                              ], // List of items in the dropdown
+                              initialValue:
+                                  'Select Date', // Initial selected value
+                              onChanged: (value) {
+                                setState(() {
+                                  clockInReminder1 = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFields(
-                  controller: requestType,
-                  firstText: 'Reason for Request',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter Reason for Request';
-                    }
-
-                    return null;
-                  },
-                  hintText: 'Enter Reason for Request',
-                ),
-                SizedBox(height: 20.h),
-                CustomTextFields(
-                  controller: note,
-                  firstText: 'Additional notes (optional)',
-                  hintText: 'Enter Additional notes (optional)',
-                  maxLength: 100,
-                  maxLines: 6,
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: CustomButton(
-                    onTap: areBothDropdownsSelected()
-                        ? () {
-                            Get.offAll(() => const RequestSubmitted());
+                      SizedBox(height: 20.h),
+                      CustomTextFields(
+                        controller: requestType,
+                        firstText: 'Reason for Request',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter Reason for Request';
                           }
-                        : () {
-                            log('Button is disabled');
-                          },
-                    decorationColor: areBothDropdownsSelected()
-                        ? GlobalColors.kDeepPurple
-                        : GlobalColors.kLightpPurple,
-                    text: 'Submit Request',
-                    textColor: areBothDropdownsSelected()
-                        ? GlobalColors.textWhiteColor
-                        : GlobalColors.kDLightpPurple,
+
+                          return null;
+                        },
+                        hintText: 'Enter Reason for Request',
+                      ),
+                      SizedBox(height: 20.h),
+                      CustomTextFields(
+                        controller: note,
+                        firstText: 'Additional notes (optional)',
+                        hintText: 'Enter Additional notes (optional)',
+                        maxLength: 100,
+                        maxLines: 6,
+                      ),
+                      SizedBox(
+                        height: 20.h,
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: CustomButton(
+                          onTap: areBothDropdownsSelected()
+                              ? () {
+                                  Get.offAll(() => const RequestSubmitted());
+                                }
+                              : () {
+                                  log('Button is disabled');
+                                },
+                          decorationColor: areBothDropdownsSelected()
+                              ? GlobalColors.kDeepPurple
+                              : GlobalColors.kLightpPurple,
+                          text: 'Submit Request',
+                          textColor: areBothDropdownsSelected()
+                              ? GlobalColors.textWhiteColor
+                              : GlobalColors.kDLightpPurple,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
