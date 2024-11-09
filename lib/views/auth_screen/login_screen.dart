@@ -1,25 +1,28 @@
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/auth_screen/forgot_password_screen.dart';
 import 'package:clockpath/views/set_up_profile_screen/set_up_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -57,14 +60,40 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Validate and Sign Up
-  void login() {
+  void login() async {
+    log(".....start");
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
     if (_formKey.currentState?.validate() ?? false) {
-      Get.offAll(() => const SetUpProfileScreen());
+      try {
+        await ref
+            .read(authProvider.notifier)
+            .login(email: email, password: password);
+        final res = ref.read(authProvider).loginRespons.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          showSuccess(
+            res.message,
+          );
+          Get.offAll(() => const SetUpProfileScreen());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).loginRespons.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.textWhiteColor,
       body: SafeArea(
@@ -168,6 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             : () {
                                 log('no');
                               },
+                        isLoading: isLoading,
                         decorationColor: _isButtonEnabled
                             ? GlobalColors.kDeepPurple
                             : GlobalColors.kLightpPurple,

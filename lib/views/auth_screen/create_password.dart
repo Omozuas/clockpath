@@ -1,22 +1,25 @@
 import 'dart:developer';
+import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/success_screens/password_succes_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CreatePasswordScreen extends StatefulWidget {
+class CreatePasswordScreen extends ConsumerStatefulWidget {
   const CreatePasswordScreen({super.key});
 
   @override
-  State<CreatePasswordScreen> createState() => _CreatePasswordScreenState();
+  ConsumerState createState() => _CreatePasswordScreenState();
 }
 
-class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
+class _CreatePasswordScreenState extends ConsumerState<CreatePasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -62,14 +65,36 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
   }
 
   // Validate and Sign Up
-  void signup() {
+  void signup() async {
+    log(".....start");
+    final String password = _passwordController.text;
+    final String confirmPassword = _confirmPasswordController.text;
     if (_formKey.currentState?.validate() ?? false) {
-      Get.offAll(() => const PasswordSuccesScreen());
+      try {
+        await ref.read(authProvider.notifier).setNewPassword(
+            newPassword: password, confirmPassword: confirmPassword);
+        final res = ref.read(authProvider).createPassword.value;
+        if (res == null) return;
+        if (res.status == 'success') {
+          Get.offAll(() => const PasswordSuccesScreen());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).createPassword.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.textWhiteColor,
       body: SafeArea(
@@ -129,7 +154,26 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                         if (value.length < 8) {
                           return 'Password must be at least 8 characters';
                         }
-                        return null;
+                        // Regular expressions for validation
+                        final hasUppercase = RegExp(r'[A-Z]');
+                        final hasLowercase = RegExp(r'[a-z]');
+                        final hasDigits = RegExp(r'[0-9]');
+                        final hasSpecialCharacters =
+                            RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+
+                        if (!hasUppercase.hasMatch(value)) {
+                          return 'Password must include at least one uppercase letter';
+                        }
+                        if (!hasLowercase.hasMatch(value)) {
+                          return 'Password must include at least one lowercase letter';
+                        }
+                        if (!hasDigits.hasMatch(value)) {
+                          return 'Password must include at least one number';
+                        }
+                        if (!hasSpecialCharacters.hasMatch(value)) {
+                          return 'Password must include at least one special character';
+                        }
+                        return null; // Password is valid
                       },
                       hintText: 'New Password',
                       obscureText: _isPasswordObscured,
@@ -170,6 +214,7 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: CustomButton(
+                        isLoading: isLoading,
                         onTap: _isButtonEnabled
                             ? signup
                             : () {

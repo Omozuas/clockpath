@@ -1,26 +1,29 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:clockpath/apis/riverPod/setup_profile_flow/setup_profile_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/set_up_profile_screen/working_days_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class SetUpProfileScreen extends StatefulWidget {
+class SetUpProfileScreen extends ConsumerStatefulWidget {
   const SetUpProfileScreen({super.key});
 
   @override
-  State<SetUpProfileScreen> createState() => _SetUpProfileScreenState();
+  ConsumerState<SetUpProfileScreen> createState() => _SetUpProfileScreenState();
 }
 
-class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
+class _SetUpProfileScreenState extends ConsumerState<SetUpProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _roleController = TextEditingController();
@@ -28,6 +31,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
   XFile? _profileImage;
   String name = '';
   late Uint8List bytes;
+  List<Map<String, dynamic>> images = [];
   @override
   void initState() {
     super.initState();
@@ -58,6 +62,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     name = pickedImage?.name ?? '';
     bytes = await pickedImage?.readAsBytes() ?? bytes;
+    images.add({"bytes": bytes, "path": name});
     setState(() {
       _profileImage = pickedImage;
 
@@ -66,9 +71,32 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
   }
 
   // Validate and Sign Up
-  void proceed() {
+  void proceed() async {
+    List<MapEntry<String, String>> formData = FormData({
+      "full_name": _fullNameController.text,
+      "role": _roleController.text,
+    }).fields;
     if (_formKey.currentState?.validate() ?? false) {
-      Get.to(() => const WorkingDaysScreen());
+      try {
+        await ref
+            .read(setupProfileProvider.notifier)
+            .setupProfilee(data: formData, images: images);
+        final res = ref.read(setupProfileProvider).setUpProfile.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          Get.to(() => const WorkingDaysScreen());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
@@ -86,6 +114,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(setupProfileProvider).setUpProfile.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.textWhiteColor,
       body: SafeArea(
@@ -219,6 +248,7 @@ class _SetUpProfileScreenState extends State<SetUpProfileScreen> {
                         decorationColor: _isButtonEnabled
                             ? GlobalColors.kDeepPurple
                             : GlobalColors.kLightpPurple,
+                        isLoading: isLoading,
                         text: 'Next',
                         textColor: _isButtonEnabled
                             ? GlobalColors.textWhiteColor

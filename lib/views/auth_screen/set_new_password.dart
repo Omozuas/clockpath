@@ -1,23 +1,26 @@
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/success_screens/password_succes_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SetNewPassword extends StatefulWidget {
+class SetNewPassword extends ConsumerStatefulWidget {
   const SetNewPassword({super.key});
 
   @override
-  State<SetNewPassword> createState() => _SetNewPasswordState();
+  ConsumerState createState() => _SetNewPasswordState();
 }
 
-class _SetNewPasswordState extends State<SetNewPassword> {
+class _SetNewPasswordState extends ConsumerState<SetNewPassword> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -63,14 +66,35 @@ class _SetNewPasswordState extends State<SetNewPassword> {
   }
 
   // Validate and Sign Up
-  void signup() {
+  void signup() async {
+    final String password = _passwordController.text;
+    final String confirmPassword = _confirmPasswordController.text;
     if (_formKey.currentState?.validate() ?? false) {
-      Get.offAll(() => const PasswordSuccesScreen());
+      try {
+        await ref.read(authProvider.notifier).resetPassword(
+            newPassword: password, confirmPassword: confirmPassword);
+        final res = ref.read(authProvider).resetPassword.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          Get.offAll(() => const PasswordSuccesScreen());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).resetPassword.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.textWhiteColor,
       body: SafeArea(
@@ -124,7 +148,26 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                         if (value.length < 8) {
                           return 'Password must be at least 8 characters';
                         }
-                        return null;
+                        // Regular expressions for validation
+                        final hasUppercase = RegExp(r'[A-Z]');
+                        final hasLowercase = RegExp(r'[a-z]');
+                        final hasDigits = RegExp(r'[0-9]');
+                        final hasSpecialCharacters =
+                            RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+
+                        if (!hasUppercase.hasMatch(value)) {
+                          return 'Password must include at least one uppercase letter';
+                        }
+                        if (!hasLowercase.hasMatch(value)) {
+                          return 'Password must include at least one lowercase letter';
+                        }
+                        if (!hasDigits.hasMatch(value)) {
+                          return 'Password must include at least one number';
+                        }
+                        if (!hasSpecialCharacters.hasMatch(value)) {
+                          return 'Password must include at least one special character';
+                        }
+                        return null; // Password is valid
                       },
                       hintText: 'New Password',
                       obscureText: _isPasswordObscured,
@@ -165,6 +208,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: CustomButton(
+                        isLoading: isLoading,
                         onTap: _isButtonEnabled
                             ? signup
                             : () {

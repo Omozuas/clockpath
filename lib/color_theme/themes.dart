@@ -19,4 +19,7 @@ class GlobalColors {
   static HexColor lightyellow = HexColor('#FFE9C8');
   static HexColor deepred = HexColor('#C02B2B');
   static HexColor lightred = HexColor('#FFEEEE');
+  static HexColor showLightRed = HexColor('#FFA3A6');
+  static HexColor showError = HexColor('#EC0C0C');
+  static HexColor showSuccess = HexColor('#39BF2D');
 }

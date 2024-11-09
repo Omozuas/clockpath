@@ -1,10 +1,11 @@
 import 'package:clockpath/color_theme/themes.dart';
-// import 'package:clockpath/config/permission_handuler.dart';
-import 'package:clockpath/views/splash_screen/splash_screen.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
+// import 'package:clockpath/views/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,10 +16,10 @@ Future<void> main() async {
       DeviceOrientation.portraitDown,
     ],
   );
-  // PermissionsMethods permissionsMethods = PermissionsMethods();
-  // await permissionsMethods.askCameraPermission();
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -41,9 +42,10 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             home: start,
+            navigatorKey: navigatorKey,
           );
         });
   }
 }
 
-Widget start = const SplashScreen();
+Widget start = const LoginScreen();

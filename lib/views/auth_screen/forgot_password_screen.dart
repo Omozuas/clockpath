@@ -1,22 +1,28 @@
+import 'dart:developer';
+
+import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/auth_screen/one_time_otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
@@ -34,14 +40,44 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   // Validate and Sign Up
-  void proceed() {
+  void proceed() async {
+    log(".....start");
+    final String email = _emailController.text;
     if (_formKey.currentState?.validate() ?? false) {
-      Get.to(() => const OneTimeOtpScreen());
+      try {
+        await ref.read(authProvider.notifier).forgotPassword(
+              email: email,
+            );
+        final res = ref.read(authProvider).forgotPassword.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          showSuccess(
+            res.message,
+          );
+          Get.to(
+            () => const OneTimeOtpScreen(),
+            arguments: {
+              'email': email,
+            },
+          );
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).forgotPassword.isLoading;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: GlobalColors.textWhiteColor,
@@ -124,6 +160,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     alignment: Alignment.bottomCenter,
                     child: CustomButton(
                         onTap: proceed,
+                        isLoading: isLoading,
                         decorationColor: GlobalColors.kDeepPurple,
                         text: 'Submit',
                         textColor: GlobalColors.textWhiteColor),

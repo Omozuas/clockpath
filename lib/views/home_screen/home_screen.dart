@@ -95,34 +95,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
-                      child: Card(
-                        borderOnForeground: true,
-                        elevation: 5,
-                        color: GlobalColors.kDeepPurple,
-                        child: Container(
-                          padding: EdgeInsets.all(10.h), // Responsive padding
-                          height: 170.h, // Responsive height
-                          width: 171.w, // Responsive width
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                                16.r), // Responsive border radius
-                          ),
+                      child: Container(
+                        padding: EdgeInsets.all(10.h), // Responsive padding
+                        height: 170.h, // Responsive height
+                        width: 171.w, // Responsive width
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                              16.r), // Responsive border radius
+                          color: GlobalColors.kDeepPurple,
+                          border: Border.all(
+                              color: GlobalColors.textWhiteColor, width: 0.9),
+                          boxShadow: [
+                            BoxShadow(
+                              color: GlobalColors.kDeepPurple.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              top: 0.4.h,
+                              bottom: 0.4.h,
+                              right: 0.4.w,
+                              left: 0.4.w),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    'Mon',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.openSans(
-                                      color: GlobalColors.textWhiteColor,
-                                      fontSize: (16.sp).clamp(12.sp,
-                                          16.sp), // Clamped responsive font size
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
                                   Container(
                                     height: 20.h, // Responsive height
                                     width: 83.w, // Responsive width
@@ -146,13 +148,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                   )
                                 ],
                               ),
-                              SizedBox(height: 10.h), // Responsive spacing
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Mon',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.openSans(
+                                      color: GlobalColors.textWhiteColor,
+                                      fontSize: (16.sp).clamp(12.sp,
+                                          16.sp), // Clamped responsive font size
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 25.h), // Responsive spacing
                               Text(
                                 '17th Jun, 2025',
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.openSans(
                                   color: GlobalColors.textWhiteColor,
-                                  fontSize: 18.sp, // Responsive font size
+                                  fontSize: 16.sp, // Responsive font size
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -173,23 +190,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(
-                        width: 5.w), // Responsive spacing between the cards
+                        width: 10.w), // Responsive spacing between the cards
                     Flexible(
-                      child: Card(
-                        borderOnForeground: true,
-                        elevation: 5,
-                        color: GlobalColors.kYellowColor,
-                        child: Container(
-                          padding: EdgeInsets.all(10.h), // Responsive padding
-                          height: 170.h, // Responsive height
-                          width: 171.w, // Responsive width
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                                16.r), // Responsive border radius
-                          ),
+                      child: Container(
+                        padding: EdgeInsets.all(10.h), // Responsive padding
+                        height: 170.h, // Responsive height
+                        width: 171.w, // Responsive width
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                              16.r), // Responsive border radius
+                          color: GlobalColors.kYellowColor,
+                          border: Border.all(
+                              color: GlobalColors.textWhiteColor, width: 0.9),
+                          boxShadow: [
+                            BoxShadow(
+                              color: GlobalColors.kYellowColor.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              top: 2.h, bottom: 2.h, right: 2.w, left: 2.w),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              SizedBox(height: 15.h),
                               Text(
                                 'Hours Left',
                                 textAlign: TextAlign.center,
@@ -201,6 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               SizedBox(height: 20.h), // Responsive spacing
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     children: [
@@ -328,6 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Expanded(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
                                     height: 31.h, // Responsive height
@@ -358,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     'Tue 18th Jun, 2025',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
-                                      color: GlobalColors.textblackSmallColor,
+                                      color: GlobalColors.textblackBoldColor,
                                       fontSize: 14.sp, // Responsive font size
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -373,69 +403,75 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: GlobalColors.lightGrayeColor,
                             ),
                             Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'START :',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.openSans(
-                                          color: GlobalColors.lightGrayeColor,
-                                          fontSize:
-                                              16.sp, // Responsive font size
-                                          fontWeight: FontWeight.w400,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 15.w),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'START :',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.openSans(
+                                            color: GlobalColors
+                                                .textblackBoldColor
+                                                .withOpacity(0.5),
+                                            fontSize:
+                                                16.sp, // Responsive font size
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                          width: 5
-                                              .w), // Responsive spacing between texts
-                                      Text(
-                                        '09:00 AM',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.openSans(
-                                          color:
-                                              GlobalColors.textblackSmallColor,
-                                          fontSize:
-                                              14.sp, // Responsive font size
-                                          fontWeight: FontWeight.w400,
+                                        SizedBox(
+                                            width: 5
+                                                .w), // Responsive spacing between texts
+                                        Text(
+                                          '09:00 AM',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.openSans(
+                                            color: GlobalColors
+                                                .textblackSmallColor,
+                                            fontSize:
+                                                14.sp, // Responsive font size
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 15.h), // Responsive spacing
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'END :',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.openSans(
-                                          color: GlobalColors.lightGrayeColor,
-                                          fontSize:
-                                              16.sp, // Responsive font size
-                                          fontWeight: FontWeight.w400,
+                                      ],
+                                    ),
+                                    SizedBox(
+                                        height: 15.h), // Responsive spacing
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'END :',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.openSans(
+                                            color: GlobalColors
+                                                .textblackBoldColor
+                                                .withOpacity(0.5),
+                                            fontSize:
+                                                16.sp, // Responsive font size
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                          width: 5
-                                              .w), // Responsive spacing between texts
-                                      Text(
-                                        '05:00 PM',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.openSans(
-                                          color:
-                                              GlobalColors.textblackSmallColor,
-                                          fontSize:
-                                              14.sp, // Responsive font size
-                                          fontWeight: FontWeight.w400,
+                                        SizedBox(
+                                            width: 5
+                                                .w), // Responsive spacing between texts
+                                        Text(
+                                          '05:00 PM',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.openSans(
+                                            color: GlobalColors
+                                                .textblackSmallColor,
+                                            fontSize:
+                                                14.sp, // Responsive font size
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -496,40 +532,48 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: GlobalColors.lightBlueColor,
                         ),
                         height: 37.h,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              'Date',
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              style: GoogleFonts.openSans(
-                                color: GlobalColors.textblackBoldColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w400,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 20.w, right: 20.w),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Date',
+                                  textAlign: TextAlign.start,
+                                  softWrap: true,
+                                  style: GoogleFonts.openSans(
+                                    color: GlobalColors.textblackBoldColor,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Clock In',
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              style: GoogleFonts.openSans(
-                                color: GlobalColors.textblackBoldColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w400,
+                              Expanded(
+                                child: Text(
+                                  'Clock In',
+                                  textAlign: TextAlign.center,
+                                  softWrap: true,
+                                  style: GoogleFonts.openSans(
+                                    color: GlobalColors.textblackBoldColor,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Clock Out',
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              style: GoogleFonts.openSans(
-                                color: GlobalColors.textblackBoldColor,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w400,
+                              Expanded(
+                                child: Text(
+                                  'Clock Out',
+                                  textAlign: TextAlign.end,
+                                  softWrap: true,
+                                  style: GoogleFonts.openSans(
+                                    color: GlobalColors.textblackBoldColor,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       ListView.builder(
@@ -550,44 +594,52 @@ class _HomeScreenState extends State<HomeScreen> {
                                       MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          '17/05/2025',
-                                          textAlign: TextAlign.center,
-                                          softWrap: true,
-                                          style: GoogleFonts.openSans(
-                                            color:
-                                                GlobalColors.textblackBoldColor,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w400,
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 20.w, right: 20.w),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              '17/05/2025',
+                                              textAlign: TextAlign.start,
+                                              softWrap: true,
+                                              style: GoogleFonts.openSans(
+                                                color: GlobalColors
+                                                    .textblackBoldColor,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '09:00 AM',
-                                          textAlign: TextAlign.center,
-                                          softWrap: true,
-                                          style: GoogleFonts.openSans(
-                                            color:
-                                                GlobalColors.textblackBoldColor,
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400,
+                                          Expanded(
+                                            child: Text(
+                                              '09:00 AM',
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
+                                              style: GoogleFonts.openSans(
+                                                color: GlobalColors
+                                                    .textblackBoldColor,
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '05:00 PM',
-                                          textAlign: TextAlign.center,
-                                          softWrap: true,
-                                          style: GoogleFonts.openSans(
-                                            color:
-                                                GlobalColors.textblackBoldColor,
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400,
+                                          Expanded(
+                                            child: Text(
+                                              '05:00 PM',
+                                              textAlign: TextAlign.end,
+                                              softWrap: true,
+                                              style: GoogleFonts.openSans(
+                                                color: GlobalColors
+                                                    .textblackBoldColor,
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                     Divider(
                                       height: 1.h, // Responsive divider width

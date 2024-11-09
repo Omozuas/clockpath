@@ -10,11 +10,12 @@ class CustomButton extends StatefulWidget {
       required this.decorationColor,
       required this.text,
       this.border = false,
+      this.isLoading = false,
       required this.textColor});
   final VoidCallback onTap;
   final String text;
   final Color decorationColor, textColor;
-  final bool border;
+  final bool border, isLoading;
   @override
   State<CustomButton> createState() => _CustomButtonState();
 }
@@ -39,15 +40,17 @@ class _CustomButtonState extends State<CustomButton> {
                   right: BorderSide.none),
         ),
         child: Center(
-          child: Text(
-            widget.text,
-            softWrap: true,
-            style: GoogleFonts.openSans(
-              color: widget.textColor,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: widget.isLoading
+              ? const CircularProgressIndicator()
+              : Text(
+                  widget.text,
+                  softWrap: true,
+                  style: GoogleFonts.openSans(
+                    color: widget.textColor,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
       ),
     );

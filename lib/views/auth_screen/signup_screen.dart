@@ -1,24 +1,27 @@
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/success_screens/email_verified_success.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _codeController = TextEditingController();
@@ -49,14 +52,36 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  signup() {
+  signup() async {
+    final String email = _emailController.text;
+    final String code = _codeController.text;
     if (_formKey.currentState?.validate() ?? false) {
-      Get.offAll(() => const EmailVerifiedSuccess());
+      try {
+        await ref
+            .read(authProvider.notifier)
+            .acceptInvite(email: email, code: code);
+        final res = ref.read(authProvider).acceptRespons.value;
+        if (res == null) return;
+        if (res.status == 'success') {
+          Get.offAll(() => const EmailVerifiedSuccess());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).acceptRespons.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.textWhiteColor,
       body: SafeArea(
@@ -148,6 +173,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             : () {
                                 log('no');
                               },
+                        isLoading: isLoading,
                         decorationColor: _isButtonEnabled
                             ? GlobalColors.kDeepPurple
                             : GlobalColors.kLightpPurple,

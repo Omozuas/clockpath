@@ -2,6 +2,7 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/controller/main_controller/main_controller.dart';
 import 'package:clockpath/views/requests/new_request.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
@@ -54,43 +55,104 @@ class _MainScreenState extends State<MainScreen> {
               controller.mainIndex.value = index, // Update the index
           items: [
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                'assets/logo/home.svg',
-                // ignore: deprecated_member_use
-                color: controller.mainIndex.value == 0
-                    ? GlobalColors.kDeepPurple
-                    : GlobalColors.grayColor,
+              icon: Container(
+                width: 44.w,
+                height: 32.h,
+                decoration: BoxDecoration(
+                    color: controller.mainIndex.value == 0
+                        ? GlobalColors.lightBlueColor
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.all(Radius.circular(16.r))),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.h,
+                    child: SvgPicture.asset(
+                      'assets/logo/home.svg',
+
+                      // ignore: deprecated_member_use
+                      color: controller.mainIndex.value == 0
+                          ? GlobalColors.kDeepPurple
+                          : GlobalColors.grayColor,
+                    ),
+                  ),
+                ),
               ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                'assets/logo/timer.svg',
-                // ignore: deprecated_member_use
-                color: controller.mainIndex.value == 1
-                    ? GlobalColors.kDeepPurple
-                    : GlobalColors.grayColor,
+              icon: Container(
+                width: 44.w,
+                height: 32.h,
+                decoration: BoxDecoration(
+                    color: controller.mainIndex.value == 1
+                        ? GlobalColors.lightBlueColor
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.all(Radius.circular(16.r))),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.h,
+                    child: SvgPicture.asset(
+                      'assets/logo/timer.svg',
+                      // ignore: deprecated_member_use
+                      color: controller.mainIndex.value == 1
+                          ? GlobalColors.kDeepPurple
+                          : GlobalColors.grayColor,
+                    ),
+                  ),
+                ),
               ),
               label: 'Clock History',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                'assets/logo/document-text.svg',
-                // ignore: deprecated_member_use
-                color: controller.mainIndex.value == 2
-                    ? GlobalColors.kDeepPurple
-                    : GlobalColors.grayColor,
+              icon: Container(
+                width: 44.w,
+                height: 32.h,
+                decoration: BoxDecoration(
+                    color: controller.mainIndex.value == 2
+                        ? GlobalColors.lightBlueColor
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.all(Radius.circular(16.r))),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.h,
+                    child: SvgPicture.asset(
+                      'assets/logo/document-text.svg',
+                      // ignore: deprecated_member_use
+                      color: controller.mainIndex.value == 2
+                          ? GlobalColors.kDeepPurple
+                          : GlobalColors.grayColor,
+                    ),
+                  ),
+                ),
               ),
               label: 'Requests',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                'assets/logo/notification.svg',
+              icon: Container(
+                width: 44.w,
+                height: 32.h,
+                decoration: BoxDecoration(
+                    color: controller.mainIndex.value == 3
+                        ? GlobalColors.lightBlueColor
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.all(Radius.circular(16.r))),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.h,
+                    child: SvgPicture.asset(
+                      'assets/logo/notification.svg',
 
-                // ignore: deprecated_member_use
-                color: controller.mainIndex.value == 3
-                    ? GlobalColors.kDeepPurple
-                    : GlobalColors.grayColor,
+                      // ignore: deprecated_member_use
+                      color: controller.mainIndex.value == 3
+                          ? GlobalColors.kDeepPurple
+                          : GlobalColors.grayColor,
+                    ),
+                  ),
+                ),
               ),
               label: 'Notifications',
             ),

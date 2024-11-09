@@ -1,21 +1,26 @@
+import 'dart:developer';
+
+import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/auth_screen/set_new_password.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class OneTimeOtpScreen extends StatefulWidget {
+class OneTimeOtpScreen extends ConsumerStatefulWidget {
   const OneTimeOtpScreen({super.key});
 
   @override
-  State<OneTimeOtpScreen> createState() => _OneTimeOtpScreenState();
+  ConsumerState<OneTimeOtpScreen> createState() => _OneTimeOtpScreenState();
 }
 
-class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
+class _OneTimeOtpScreenState extends ConsumerState<OneTimeOtpScreen> {
   final _formKey = GlobalKey<FormState>();
   final List<TextEditingController> _otpControllers =
       List.generate(6, (index) => TextEditingController());
@@ -36,15 +41,37 @@ class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
   }
 
   // Validate and Sign Up
-  void proceed() {
-    // String otp = _otpControllers.map((controller) => controller.text).join();
+  void proceed() async {
+    String otp = _otpControllers.map((controller) => controller.text).join();
     if (_formKey.currentState?.validate() ?? false) {
-      Get.offAll(() => const SetNewPassword());
+      try {
+        await ref.read(authProvider.notifier).oneTimePin(otp: otp);
+        final res = ref.read(authProvider).oneTimePin.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          showSuccess(
+            res.message,
+          );
+          Get.offAll(() => const SetNewPassword());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).oneTimePin.isLoading;
+    final isLoading1 = ref.watch(authProvider).forgotPassword.isLoading;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: GlobalColors.textWhiteColor,
@@ -142,6 +169,7 @@ class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
                         CustomButton(
                             onTap: proceed,
                             decorationColor: GlobalColors.kDeepPurple,
+                            isLoading: isLoading,
                             text: 'Verify OTP',
                             textColor: GlobalColors.textWhiteColor),
                         SizedBox(
@@ -161,9 +189,9 @@ class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
                               ),
                             ),
                             InkWell(
-                              onTap: () {},
+                              onTap: isLoading1 ? () {} : resend,
                               child: Text(
-                                'Resend',
+                                isLoading1 ? 'loading...' : 'Resend',
                                 textAlign: TextAlign.center,
                                 softWrap: true,
                                 style: GoogleFonts.openSans(
@@ -185,5 +213,34 @@ class _OneTimeOtpScreenState extends State<OneTimeOtpScreen> {
         ),
       ),
     );
+  }
+
+  void resend() async {
+    log(".....start");
+    final arguments = Get.arguments;
+    final email = arguments['email'] ?? '';
+
+    try {
+      await ref.read(authProvider.notifier).forgotPassword(
+            email: email,
+          );
+      final res = ref.read(authProvider).forgotPassword.value;
+      if (res == null) return;
+      if (res.status == "success") {
+        showSuccess(
+          res.message,
+        );
+      } else {
+        log(res.message);
+        showError(
+          res.message,
+        );
+      }
+    } catch (e) {
+      log(e.toString());
+      showError(
+        e.toString(),
+      );
+    }
   }
 }
