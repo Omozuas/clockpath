@@ -8,10 +8,10 @@ class SetupProfileProvider
   SetupProfileProviderStates build() {
     return const SetupProfileProviderStates(
       setUpProfile: AsyncData(null),
-      // createPassword: AsyncData(null),
-      // loginRespons: AsyncData(null),
-      // forgotPassword: AsyncData(null),
-      // oneTimePin: AsyncData(null),
+      setupWorkDays: AsyncData(null),
+      clockIn: AsyncData(null),
+      clockOut: AsyncData(null),
+      // updateProfile: AsyncData(null),
       // resetPassword: AsyncData(null)
     );
   }
@@ -30,44 +30,47 @@ class SetupProfileProvider
     }
   }
 
-  // Future<void> setNewPassword(
-  //     {required String newPassword, required String confirmPassword}) async {
-  //   final auth = ref.read(authServicesProvider);
-  //   try {
-  //     state = state.copyWith(createPassword: const AsyncLoading());
-  //     final response = await auth.createPassword(
-  //         newPassword: newPassword, confirmPassword: confirmPassword);
-  //     state = state.copyWith(createPassword: AsyncData(response));
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //         createPassword: AsyncError(e.toString(), StackTrace.current));
-  //   }
-  // }
+  Future<void> setupPWordDays(
+      {required List<Map<String, dynamic>> work}) async {
+    final auth = ref.read(setupProfileApi);
+    try {
+      state = state.copyWith(setupWorkDays: const AsyncLoading());
+      final response = await auth.setupPWordDays(work: work);
+      state = state.copyWith(setupWorkDays: AsyncData(response));
+    } catch (e) {
+      state = state.copyWith(
+          setupWorkDays: AsyncError(e.toString(), StackTrace.current));
+    }
+  }
 
-  // Future<void> login({required String email, required String password}) async {
-  //   final auth = ref.read(authServicesProvider);
-  //   try {
-  //     state = state.copyWith(loginRespons: const AsyncLoading());
-  //     final response =
-  //         await auth.loginRespons(email: email, password: password);
-  //     state = state.copyWith(loginRespons: AsyncData(response));
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //         loginRespons: AsyncError(e.toString(), StackTrace.current));
-  //   }
-  // }
+//clockIn and Out
+  Future<void> clockIn(
+      {required double longitude, required double latitude}) async {
+    final auth = ref.read(setupProfileApi);
+    try {
+      state = state.copyWith(clockIn: const AsyncLoading());
+      final response =
+          await auth.clockIn(longitude: longitude, latitude: latitude);
+      state = state.copyWith(clockIn: AsyncData(response));
+    } catch (e) {
+      state =
+          state.copyWith(clockIn: AsyncError(e.toString(), StackTrace.current));
+    }
+  }
 
-  // Future<void> forgotPassword({required String email}) async {
-  //   final auth = ref.read(authServicesProvider);
-  //   try {
-  //     state = state.copyWith(forgotPassword: const AsyncLoading());
-  //     final response = await auth.forgotPassword(email: email);
-  //     state = state.copyWith(forgotPassword: AsyncData(response));
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //         forgotPassword: AsyncError(e.toString(), StackTrace.current));
-  //   }
-  // }
+  Future<void> clockOut(
+      {required double longitude, required double latitude}) async {
+    final auth = ref.read(setupProfileApi);
+    try {
+      state = state.copyWith(clockOut: const AsyncLoading());
+      final response =
+          await auth.clockOut(longitude: longitude, latitude: latitude);
+      state = state.copyWith(clockOut: AsyncData(response));
+    } catch (e) {
+      state = state.copyWith(
+          clockOut: AsyncError(e.toString(), StackTrace.current));
+    }
+  }
 
   // Future<void> oneTimePin({required String otp}) async {
   //   final auth = ref.read(authServicesProvider);
@@ -101,33 +104,33 @@ final setupProfileProvider = AutoDisposeNotifierProvider<SetupProfileProvider,
 
 class SetupProfileProviderStates {
   final AsyncValue<GeneralRespons?> setUpProfile;
-  // final AsyncValue<GeneralRespons?> createPassword;
-  // final AsyncValue<GeneralRespons?> loginRespons;
-  // final AsyncValue<GeneralRespons?> forgotPassword;
-  // final AsyncValue<GeneralRespons?> oneTimePin;
+  final AsyncValue<GeneralRespons?> setupWorkDays;
+  final AsyncValue<GeneralRespons?> clockIn;
+  final AsyncValue<GeneralRespons?> clockOut;
+  // final AsyncValue<GeneralRespons?> updateProfile;
   // final AsyncValue<GeneralRespons?> resetPassword;
   const SetupProfileProviderStates({
     required this.setUpProfile,
-    // required this.createPassword,
-    // required this.loginRespons,
-    // required this.forgotPassword,
-    // required this.oneTimePin,
+    required this.setupWorkDays,
+    required this.clockIn,
+    required this.clockOut,
+    // required this.updateProfile,
     // required this.resetPassword
   });
   SetupProfileProviderStates copyWith({
     AsyncValue<GeneralRespons?>? setUpProfile,
-    // AsyncValue<GeneralRespons?>? createPassword,
-    // AsyncValue<GeneralRespons?>? loginRespons,
-    // AsyncValue<GeneralRespons?>? forgotPassword,
-    // AsyncValue<GeneralRespons?>? oneTimePin,
+    AsyncValue<GeneralRespons?>? setupWorkDays,
+    AsyncValue<GeneralRespons?>? clockIn,
+    AsyncValue<GeneralRespons?>? clockOut,
+    AsyncValue<GeneralRespons?>? updateProfile,
     // AsyncValue<GeneralRespons?>? resetPassword,
   }) {
     return SetupProfileProviderStates(
       setUpProfile: setUpProfile ?? this.setUpProfile,
-      // createPassword: createPassword ?? this.createPassword,
-      // loginRespons: loginRespons ?? this.loginRespons,
-      // forgotPassword: forgotPassword ?? this.forgotPassword,
-      // oneTimePin: oneTimePin ?? this.oneTimePin,
+      setupWorkDays: setupWorkDays ?? this.setupWorkDays,
+      clockIn: clockIn ?? this.clockIn,
+      clockOut: clockOut ?? this.clockOut,
+      // updateProfile: updateProfile ?? this.updateProfile,
       // resetPassword: resetPassword ?? this.resetPassword
     );
   }

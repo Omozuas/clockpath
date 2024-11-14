@@ -1,26 +1,74 @@
+import 'dart:developer';
+
+import 'package:clockpath/apis/riverPod/settings_provider/settings_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_listTile.dart';
 import 'package:clockpath/common/custom_popup.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/settings_screen/sub_setting_screen/manage_password_screen.dart';
 import 'package:clockpath/views/settings_screen/sub_setting_screen/manage_shift_screen.dart';
 import 'package:clockpath/views/settings_screen/sub_setting_screen/profile_screen.dart';
 import 'package:clockpath/views/settings_screen/sub_setting_screen/reminder_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  String nnn = '';
+  void logOut() async {
+    try {
+      await ref.read(settingsProvider.notifier).logOut();
+      final res = ref.read(settingsProvider).logOut.value;
+      if (res == null) return;
+      if (res.status == 'success') {
+        showSuccess(res.message);
+        _clearSessionData();
+        Get.offAll(() => const LoginScreen());
+      } else {
+        log(res.message);
+        getImge();
+        showError(
+          res.message,
+        );
+      }
+    } catch (e) {
+      log(e.toString());
+      showError(
+        e.toString(),
+      );
+    }
+  }
+
+  void getImge() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      nnn = preferences.getString('access_token') ?? '';
+      log(nnn);
+    });
+  }
+
+  Future<void> _clearSessionData() async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.remove('resetToken');
+    preferences.remove('refresh_token');
+    preferences.remove('access_token');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(settingsProvider).logOut.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(
@@ -109,12 +157,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   GestureDetector(
                     onTap: () => showCustomPopup(
                         context: context,
-                        boxh: 190.h,
+                        boxh: 220.h,
                         boxw: 254.w,
                         decorationColor: GlobalColors.kDeepPurple,
                         firstText: 'LogOut From Your Account',
                         secondText: 'Are you sure you want to log out?',
-                        proceed: () {}),
+                        proceed: () {
+                          Get.back();
+                          logOut();
+                        }),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -127,7 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           width: 7.w,
                         ),
                         Text(
-                          'LogOut',
+                          isLoading ? 'LoggingOut...' : 'LogOut',
                           textAlign: TextAlign.center,
                           softWrap: true,
                           style: GoogleFonts.openSans(

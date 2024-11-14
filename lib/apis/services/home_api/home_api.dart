@@ -1,63 +1,18 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:clockpath/apis/models/recent_activity_model.dart';
 import 'package:clockpath/apis/respones/general_respons.dart';
 import 'package:clockpath/apis/services/api_services.dart';
 import 'package:clockpath/apis/urls/connection_urls.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SetupprofileApi {
+class HomeApi {
   ApiService apiService = ApiService(baseUrl: ConnectionUrls.baseUrl);
-  SetupprofileApi(this.ref);
+  HomeApi(this.ref);
   final Ref ref;
-
-  Future<GeneralRespons> setupProfile(
-      {required List<MapEntry<String, dynamic>> data,
-      List<Map<String, dynamic>>? images}) async {
-    final token = await getAccessToken();
-    try {
-      final response = await apiService.multPathpost(
-          endpoint: ConnectionUrls.setupProfileEndpoint,
-          token: token,
-          data: data,
-          images: images);
-      saveUserDids(response);
-      return response!;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<GeneralRespons> updateProfile(
-      {required List<MapEntry<String, dynamic>> data,
-      List<Map<String, dynamic>>? images}) async {
-    final token = await getAccessToken();
-    try {
-      final response = await apiService.multPathput(
-          endpoint: ConnectionUrls.setupProfileEndpoint,
-          token: token,
-          data: data,
-          images: images);
-      saveUserDids(response);
-      return response!;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<GeneralRespons> setupPWordDays(
-      {required List<Map<String, dynamic>> work}) async {
-    final token = await getAccessToken();
-    try {
-      final response = await apiService.put(
-          endpoint: ConnectionUrls.setupWorkDaysEndpoint,
-          token: token,
-          body: {"work_days": work});
-
-      return response!;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   //clockIn and clockOut
 
   Future<GeneralRespons> clockIn(
@@ -90,6 +45,40 @@ class SetupprofileApi {
     }
   }
 
+//get
+  Future<RecentActivityModel> getRecentResults() async {
+    final token = await getAccessToken();
+
+    try {
+      final response = await apiService.get(
+        endpoint: ConnectionUrls.getrecentActivityEndpoint,
+        token: token,
+      );
+      final body = jsonDecode(response.body);
+
+      return RecentActivityModel.fromJson(body);
+    } on TimeoutException catch (_) {
+      return RecentActivityModel(
+        status: 'false',
+        message: 'Request Timeout',
+      );
+    } on SocketException catch (_) {
+      return RecentActivityModel(
+        status: 'false',
+        message: 'No Internet connection',
+      );
+    } catch (e) {
+      final err = e as Map;
+      final code = err['code'];
+      final message = err['message'];
+      final requestErr = err['error'];
+      return RecentActivityModel(
+        status: code ?? 'false',
+        message: message ?? requestErr ?? 'Something went wrong $e',
+      );
+    }
+  }
+
   Future<String> getAccessToken() async {
     final preferences = await SharedPreferences.getInstance();
     return preferences.getString('access_token') ?? '';
@@ -104,13 +93,10 @@ class SetupprofileApi {
     if (response == null) return;
     final image = response.data["data"]["image"]["imageUrl"];
     final name = response.data["data"]["full_name"];
-    final role = response.data["data"]["role"];
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('image', image);
     preferences.setString('name', name);
-    preferences.setString('role', role);
   }
 }
 
-final setupProfileApi =
-    Provider<SetupprofileApi>((ref) => SetupprofileApi(ref));
+final homeApi = Provider<HomeApi>((ref) => HomeApi(ref));

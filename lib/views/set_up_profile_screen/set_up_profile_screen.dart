@@ -29,7 +29,7 @@ class _SetUpProfileScreenState extends ConsumerState<SetUpProfileScreen> {
   final _roleController = TextEditingController();
   bool _isButtonEnabled = false;
   XFile? _profileImage;
-  String name = '';
+
   late Uint8List bytes;
   List<Map<String, dynamic>> images = [];
   @override
@@ -60,13 +60,14 @@ class _SetUpProfileScreenState extends ConsumerState<SetUpProfileScreen> {
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    name = pickedImage?.name ?? '';
+    String name = pickedImage?.name ?? '';
     bytes = await pickedImage?.readAsBytes() ?? bytes;
     images.add({"bytes": bytes, "path": name});
     setState(() {
       _profileImage = pickedImage;
-
-      log('path:$bytes,name:$name');
+      name = pickedImage!.name;
+      bytes = bytes;
+      log(',name:$name');
     });
   }
 
@@ -84,6 +85,9 @@ class _SetUpProfileScreenState extends ConsumerState<SetUpProfileScreen> {
         final res = ref.read(setupProfileProvider).setUpProfile.value;
         if (res == null) return;
         if (res.status == "success") {
+          showSuccess(
+            res.message,
+          );
           Get.to(() => const WorkingDaysScreen());
         } else {
           log(res.message);

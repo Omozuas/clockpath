@@ -70,7 +70,7 @@ void showError(String message, {int durationSeconds = 3}) {
       child: Material(
         color: Colors.transparent,
         child: Container(
-          height: 56.h,
+          // height: 56.h,
           padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
           decoration: BoxDecoration(
             color: GlobalColors.showLightRed.withOpacity(0.3),
@@ -124,7 +124,7 @@ void showWarnning(String message,
       child: Material(
         color: Colors.transparent,
         child: Container(
-          height: 56.h,
+          // height: 56.h,
           padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
           decoration: BoxDecoration(
             color: GlobalColors.lightyellow.withOpacity(0.3),

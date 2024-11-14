@@ -1,20 +1,29 @@
+import 'dart:developer';
+
+import 'package:clockpath/apis/riverPod/settings_provider/settings_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
+import 'package:clockpath/common/custom_popup.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ManagePasswordScreen extends StatefulWidget {
+class ManagePasswordScreen extends ConsumerStatefulWidget {
   const ManagePasswordScreen({super.key});
 
   @override
-  State<ManagePasswordScreen> createState() => _ManagePasswordScreenState();
+  ConsumerState<ManagePasswordScreen> createState() =>
+      _ManagePasswordScreenState();
 }
 
-class _ManagePasswordScreenState extends State<ManagePasswordScreen> {
+class _ManagePasswordScreenState extends ConsumerState<ManagePasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -41,8 +50,47 @@ class _ManagePasswordScreenState extends State<ManagePasswordScreen> {
     });
   }
 
+  void proceed() async {
+    final String password = _passwordController.text;
+    final String confirmPassword = _confirmPasswordController.text;
+    final String currentPassword = _currentPasswordController.text;
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        await ref.read(settingsProvider.notifier).managePassword(
+            currentPassword: currentPassword,
+            newPassword: password,
+            confirmPassword: confirmPassword);
+        final res = ref.read(settingsProvider).managePassword.value;
+        if (res == null) return;
+        if (res.status == 'success') {
+          showSuccess(res.message);
+          _clearSessionData();
+          Get.offAll(() => const LoginScreen());
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
+    }
+  }
+
+  Future<void> _clearSessionData() async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.remove('resetToken');
+    preferences.remove('refresh_token');
+    preferences.remove('access_token');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(settingsProvider).managePassword.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(
@@ -109,9 +157,7 @@ class _ManagePasswordScreenState extends State<ManagePasswordScreen> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your Current Password';
                             }
-                            if (value.length < 8) {
-                              return 'Password must be at least 8 characters';
-                            }
+
                             return null;
                           },
                           hintText: 'Enter Password',
@@ -136,7 +182,26 @@ class _ManagePasswordScreenState extends State<ManagePasswordScreen> {
                             if (value.length < 8) {
                               return 'Password must be at least 8 characters';
                             }
-                            return null;
+                            // Regular expressions for validation
+                            final hasUppercase = RegExp(r'[A-Z]');
+                            final hasLowercase = RegExp(r'[a-z]');
+                            final hasDigits = RegExp(r'[0-9]');
+                            final hasSpecialCharacters =
+                                RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+
+                            if (!hasUppercase.hasMatch(value)) {
+                              return 'Password must include at least one uppercase letter';
+                            }
+                            if (!hasLowercase.hasMatch(value)) {
+                              return 'Password must include at least one lowercase letter';
+                            }
+                            if (!hasDigits.hasMatch(value)) {
+                              return 'Password must include at least one number';
+                            }
+                            if (!hasSpecialCharacters.hasMatch(value)) {
+                              return 'Password must include at least one special character';
+                            }
+                            return null; // Password is valid
                           },
                           hintText: 'Enter new password',
                           obscureText: _isPasswordObscured,
@@ -177,7 +242,19 @@ class _ManagePasswordScreenState extends State<ManagePasswordScreen> {
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: CustomButton(
-                              onTap: () {},
+                              onTap: () => showCustomPopup(
+                                  context: context,
+                                  boxh: 220.h,
+                                  boxw: 254.w,
+                                  decorationColor: GlobalColors.kDeepPurple,
+                                  firstText: 'Change Password',
+                                  secondText:
+                                      'Atempting to change password will logout from your account?',
+                                  proceed: () {
+                                    Get.back();
+                                    proceed();
+                                  }),
+                              isLoading: isLoading,
                               decorationColor: GlobalColors.kDeepPurple,
                               text: 'Save New Password',
                               textColor: GlobalColors.textWhiteColor),

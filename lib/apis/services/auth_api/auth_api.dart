@@ -50,6 +50,8 @@ class AuthServices {
         body: {"email": email, "password": password},
       );
       saveToken(response);
+
+      saveUserDids(response);
       return response!;
     } catch (e) {
       rethrow;
@@ -150,6 +152,15 @@ class AuthServices {
   Future<String> getuserId() async {
     final preferences = await SharedPreferences.getInstance();
     return preferences.getString('userID') ?? '';
+  }
+
+  void saveUserDids(GeneralRespons? response) async {
+    if (response == null) return;
+    final image = response.data["user"]["image"]["imageUrl"];
+    final name = response.data["user"]["full_name"];
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setString('image', image);
+    preferences.setString('name', name);
   }
 }
 

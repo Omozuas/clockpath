@@ -1,28 +1,273 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
+import 'package:clockpath/apis/riverPod/setup_profile_flow/setup_profile_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_bottomsheet.dart';
 import 'package:clockpath/common/custom_button.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/settings_screen/settings_screen.dart';
+import 'package:clockpath/views/settings_screen/sub_setting_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  String currentTime1 = DateFormat('h:mm a').format(DateTime.now());
+  double? locationMessage;
+  double? locationMessage1;
+  bool isClockedIn = false;
+  late Timer timer;
+  String networkImg = '', fullName = '';
+  @override
+  void initState() {
+    super.initState();
+    getDate();
+    timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
+      setState(() {
+        currentTime1 = DateFormat('h:mm a').format(DateTime.now());
+      });
+    });
+    getstatusLocation();
+    getImge();
+    Future.microtask(() => getRecentResults());
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  String day = '', formattedDate1 = '', currentTime = '';
+  void getDate() {
+    DateTime now = DateTime.now();
+
+    // Format current date as '17th June 2023'
+    String formattedDate = DateFormat("d'th' MMM yyyy").format(now);
+
+    // Current day of the week
+    String dayOfWeek = DateFormat('E').format(now);
+
+    // Current time in 12-hour format with AM/PM
+    String formattedTime = DateFormat('h:mm a').format(now);
+    setState(() {
+      day = dayOfWeek;
+      formattedDate1 = formattedDate;
+      currentTime = formattedTime;
+    });
+    log("Current Date: $formattedDate");
+    log("Day of the Week: $dayOfWeek");
+    log("Current Time: $formattedTime");
+  }
+
+  void clockIn({required double latitude, required double longitude}) async {
+    try {
+      log('...$latitude,$longitude');
+      await ref
+          .read(setupProfileProvider.notifier)
+          .clockIn(longitude: longitude, latitude: latitude);
+      final res = ref.read(setupProfileProvider).clockIn.value;
+      if (res == null) return;
+      if (res.status == "success") {
+        log('...success');
+        statusLocation(isThere: 'true');
+        getstatusLocation();
+        showSuccess(res.message);
+      } else {
+        log(res.message);
+        if (mounted) {
+          customBottomSheet(
+              context: context,
+              firstText: 'Far Away from Location',
+              secondText: res.message,
+              buttonText: 'Proceed',
+              ontap: () {
+                Get.back();
+              });
+        }
+        statusLocation(isThere: 'false');
+        getstatusLocation();
+        showError(res.message);
+      }
+    } catch (e) {
+      log(e.toString());
+      showError(
+        e.toString(),
+      );
+    }
+  }
+
+  void clockOut({required double latitude, required double longitude}) async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      var did = preferences.getString('isclockin') ?? '';
+
+      if (did == 'true') {
+        await ref
+            .read(setupProfileProvider.notifier)
+            .clockOut(longitude: longitude, latitude: latitude);
+        final res = ref.read(setupProfileProvider).clockOut.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          statusLocation(isThere: 'false');
+          getstatusLocation();
+          showSuccess(res.message);
+        } else {
+          log(res.message);
+          if (mounted) {
+            customBottomSheet(
+                context: context,
+                firstText: 'Far Away from Location',
+                secondText: res.message,
+                buttonText: 'Proceed',
+                ontap: () {
+                  Get.back();
+                });
+          }
+          statusLocation(isThere: 'true');
+          getstatusLocation();
+        }
+      } else {
+        showError('failed to clocked out');
+      }
+    } catch (e) {
+      log(e.toString());
+      showError(
+        e.toString(),
+      );
+    }
+  }
+
+  Future<String> getstatusLocation() async {
+    final preferences = await SharedPreferences.getInstance();
+    var did = preferences.getString('isclockin') ?? '';
+    if (did == 'true') {
+      setState(() {
+        isClockedIn == true;
+      });
+    }
+    return preferences.getString('isclockin') ?? '';
+  }
+
+  // Function to request location permission and get the user's location
+  Future<void> _requestLocationPermission() async {
+    // Check if location permissions are granted
+    var status = await Permission.locationWhenInUse.status;
+
+    if (status.isDenied) {
+      // Request location permission
+      if (mounted) {
+        customBottomSheet(
+            context: context,
+            firstText: 'Location Access Required',
+            secondText:
+                'You cant clock in without granting location access. Please enable location services to proceed with accurate time tracking',
+            buttonText: 'Enable Location',
+            ontap: () async {
+              Get.back();
+              status = await Permission.locationWhenInUse.request();
+            });
+      }
+    }
+
+    if (status.isGranted) {
+      // Permission granted, fetch the user's location
+      await _getCurrentLocation();
+    } else {
+      // Permission denied, show a message
+      showError('Location permission denied. Please allow access to continue.');
+      // setState(() {
+      //   _locationMessage =
+      //       'Location permission denied. Please allow access to continue.';
+      // });
+    }
+  }
+
+  // Function to get the current location of the user
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      showError(
+          'Location services are disabled. Please enable them in the settings.');
+
+      return;
+    }
+
+    // Check if app has location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        showError(
+            'Location permission denied. Please allow access to continue.');
+
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      showError(
+          'Location permissions are permanently denied. Please enable them from settings.');
+
+      return;
+    }
+
+    // Fetch the current location
+    Position position = await Geolocator.getCurrentPosition(
+        // ignore: deprecated_member_use
+        desiredAccuracy: LocationAccuracy.high);
+
+    // setState(() {
+    //   _locationMessage =
+    //       'Your location: Lat ${position.latitude}, Long ${position.longitude}';
+    // });
+    setState(() {
+      locationMessage = position.latitude;
+      locationMessage1 = position.longitude;
+    });
+    // Proceed to main screen after successful location fetch
+    clockIn(
+        latitude: position.latitude,
+        longitude: position
+            .longitude); // Navigate only after location is successfully fetched
+  }
+
+  void statusLocation({required String isThere}) async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setString('isclockin', isThere);
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.watch(setupProfileProvider).clockIn;
+    ref.watch(setupProfileProvider).clockOut;
+    final recentAct = ref.watch(getRecentActivityProvider);
     return Stack(
       children: [
         SingleChildScrollView(
           padding:
-              EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h, bottom: 20.h),
+              EdgeInsets.only(left: 20.w, right: 20.w, top: 20.h, bottom: 80.h),
           child: Center(
             child: Column(
               children: [
@@ -33,19 +278,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 40.h,
-                          width: 40.w,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: GlobalColors.lightGrayeColor,
+                        GestureDetector(
+                          onTap: () => Get.to(() => const ProfileScreen()),
+                          child: Container(
+                            height: 40.h,
+                            width: 40.w,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: GlobalColors.lightGrayeColor,
+                              ),
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: networkImg.isEmpty
+                                      ? const AssetImage(
+                                          'assets/icons/profile-circle.png')
+                                      : NetworkImage(networkImg)),
                             ),
-                            shape: BoxShape.circle,
-                            image: const DecorationImage(
-                                fit: BoxFit.cover,
-                                image: AssetImage(
-                                    'assets/icons/profile-circle.png')),
                           ),
                         ),
                         SizedBox(
@@ -65,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             Text(
-                              'John Doe',
+                              fullName,
                               textAlign: TextAlign.center,
                               softWrap: true,
                               style: GoogleFonts.openSans(
@@ -152,7 +402,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Mon',
+                                    day,
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                       color: GlobalColors.textWhiteColor,
@@ -165,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               SizedBox(height: 25.h), // Responsive spacing
                               Text(
-                                '17th Jun, 2025',
+                                formattedDate1,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.openSans(
                                   color: GlobalColors.textWhiteColor,
@@ -175,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               SizedBox(height: 20.h), // Responsive spacing
                               Text(
-                                '09:00 AM',
+                                currentTime1,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.openSans(
                                   color: GlobalColors.textWhiteColor,
@@ -576,82 +826,213 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      ListView.builder(
-                          itemCount: 10,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: GlobalColors.backgroundColor2,
-                              ),
-                              height: 37.h,
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 0, top: 10.dg),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
+                      recentAct.when(
+                          skipLoadingOnReload: true,
+                          skipLoadingOnRefresh: true,
+                          data: (data) {
+                            var info = data?.data?.results;
+                            if (info == null) {
+                              return SizedBox(
+                                height: 180.h,
+                                child: Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'No Clock History Yet',
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        style: GoogleFonts.openSans(
+                                          color:
+                                              GlobalColors.textblackBoldColor,
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(height: 20.h),
+                                      Text(
+                                        'You havent clocked in yet. Start your first shift to see your work hours here',
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        style: GoogleFonts.openSans(
+                                          color:
+                                              GlobalColors.textblackSmallColor,
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            return ListView.builder(
+                                itemCount: info.length,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  final item = info[index];
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: GlobalColors.backgroundColor2,
+                                    ),
+                                    height: 37.h,
+                                    child: Padding(
                                       padding: EdgeInsets.only(
-                                          left: 20.w, right: 20.w),
-                                      child: Row(
+                                          bottom: 0, top: 10.dg),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              '17/05/2025',
-                                              textAlign: TextAlign.start,
-                                              softWrap: true,
-                                              style: GoogleFonts.openSans(
-                                                color: GlobalColors
-                                                    .textblackBoldColor,
-                                                fontSize: 12.sp,
-                                                fontWeight: FontWeight.w400,
-                                              ),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 20.w, right: 20.w),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    item.date ?? '',
+                                                    textAlign: TextAlign.start,
+                                                    softWrap: true,
+                                                    style: GoogleFonts.openSans(
+                                                      color: GlobalColors
+                                                          .textblackBoldColor,
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    item.clockInTime ?? '',
+                                                    textAlign: TextAlign.center,
+                                                    softWrap: true,
+                                                    style: GoogleFonts.openSans(
+                                                      color: GlobalColors
+                                                          .textblackBoldColor,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    item.clockOutTime ??
+                                                        '-------------',
+                                                    textAlign: TextAlign.end,
+                                                    softWrap: true,
+                                                    style: GoogleFonts.openSans(
+                                                      color: GlobalColors
+                                                          .textblackBoldColor,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          Expanded(
-                                            child: Text(
-                                              '09:00 AM',
-                                              textAlign: TextAlign.center,
-                                              softWrap: true,
-                                              style: GoogleFonts.openSans(
-                                                color: GlobalColors
-                                                    .textblackBoldColor,
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              '05:00 PM',
-                                              textAlign: TextAlign.end,
-                                              softWrap: true,
-                                              style: GoogleFonts.openSans(
-                                                color: GlobalColors
-                                                    .textblackBoldColor,
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ),
+                                          Divider(
+                                            height:
+                                                1.h, // Responsive divider width
+                                            indent: 30.h, // Responsive indent
+                                            endIndent:
+                                                30.h, // Responsive end indent
+                                            color: GlobalColors.lightGrayeColor,
+                                          )
                                         ],
                                       ),
                                     ),
-                                    Divider(
-                                      height: 1.h, // Responsive divider width
-                                      indent: 30.h, // Responsive indent
-                                      endIndent: 30.h, // Responsive end indent
-                                      color: GlobalColors.lightGrayeColor,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          }),
+                                  );
+                                });
+                          },
+                          error: (e, s) {
+                            return Text('$e,$s');
+                          },
+                          loading: () => const Text('..loading')),
+
+                      // ListView.builder(
+                      //     itemCount: 10,
+                      //     shrinkWrap: true,
+                      //     scrollDirection: Axis.vertical,
+                      //     physics: const NeverScrollableScrollPhysics(),
+                      //     itemBuilder: (context, index) {
+                      //       return Container(
+                      //         decoration: BoxDecoration(
+                      //           color: GlobalColors.backgroundColor2,
+                      //         ),
+                      //         height: 37.h,
+                      //         child: Padding(
+                      //           padding: EdgeInsets.only(bottom: 0, top: 10.dg),
+                      //           child: Column(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment.spaceEvenly,
+                      //             crossAxisAlignment: CrossAxisAlignment.center,
+                      //             children: [
+                      //               Padding(
+                      //                 padding: EdgeInsets.only(
+                      //                     left: 20.w, right: 20.w),
+                      //                 child: Row(
+                      //                   children: [
+                      //                     Expanded(
+                      //                       child: Text(
+                      //                         '17/05/2025',
+                      //                         textAlign: TextAlign.start,
+                      //                         softWrap: true,
+                      //                         style: GoogleFonts.openSans(
+                      //                           color: GlobalColors
+                      //                               .textblackBoldColor,
+                      //                           fontSize: 12.sp,
+                      //                           fontWeight: FontWeight.w400,
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                     Expanded(
+                      //                       child: Text(
+                      //                         '09:00 AM',
+                      //                         textAlign: TextAlign.center,
+                      //                         softWrap: true,
+                      //                         style: GoogleFonts.openSans(
+                      //                           color: GlobalColors
+                      //                               .textblackBoldColor,
+                      //                           fontSize: 14.sp,
+                      //                           fontWeight: FontWeight.w400,
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                     Expanded(
+                      //                       child: Text(
+                      //                         '05:00 PM',
+                      //                         textAlign: TextAlign.end,
+                      //                         softWrap: true,
+                      //                         style: GoogleFonts.openSans(
+                      //                           color: GlobalColors
+                      //                               .textblackBoldColor,
+                      //                           fontSize: 14.sp,
+                      //                           fontWeight: FontWeight.w400,
+                      //                         ),
+                      //                       ),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               ),
+                      //               Divider(
+                      //                 height: 1.h, // Responsive divider width
+                      //                 indent: 30.h, // Responsive indent
+                      //                 endIndent: 30.h, // Responsive end indent
+                      //                 color: GlobalColors.lightGrayeColor,
+                      //               )
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }),
                     ],
                   ),
                 )
@@ -664,40 +1045,63 @@ class _HomeScreenState extends State<HomeScreen> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(
-                  left: 20, right: 20, top: 20, bottom: 20),
-              child: CustomButton(
-                  onTap: () => customBottomSheet(
-                      context: context,
-                      firstText: 'Confirm Clock In',
-                      secondText:
-                          'Your clock-in time will be recorded as 08:58 AM. Are you ready to start your shift?',
-                      buttonText: 'Confirm Clock In',
-                      ontap: () {
-                        Get.back();
-                        customBottomSheet(
-                            context: context,
-                            firstText: 'Location Access Required',
-                            secondText:
-                                'You cant clock in without granting location access. Please enable location services to proceed with accurate time tracking',
-                            buttonText: 'Enable Location',
-                            ontap: () {
-                              Get.back();
-                              customBottomSheet(
-                                  context: context,
-                                  firstText: 'Far Away from Location',
-                                  secondText:
-                                      'You’re a bit too far from your shift’s location. Are you sure you want to proceed?',
-                                  buttonText: 'Proceed',
-                                  ontap: () {});
-                            });
-                      }),
-                  decorationColor: GlobalColors.kDeepPurple,
-                  text: 'Clock In',
-                  textColor: GlobalColors.textWhiteColor),
+                  left: 20, right: 20, top: 20, bottom: 10),
+              child: isClockedIn == false
+                  ? CustomButton(
+                      onTap: () => customBottomSheet(
+                          context: context,
+                          firstText: 'Confirm Clock In',
+                          secondText:
+                              'Your clock-in time will be recorded as $currentTime1. Are you ready to start your shift?',
+                          buttonText: 'Confirm Clock In',
+                          ontap: () {
+                            Get.back();
+                            _requestLocationPermission();
+                          }),
+                      decorationColor: GlobalColors.kDeepPurple,
+                      text: 'Clock In',
+                      textColor: GlobalColors.textWhiteColor)
+                  : CustomButton(
+                      onTap: () => customBottomSheet(
+                          context: context,
+                          firstText: 'Confirm Clock Out',
+                          secondText:
+                              'Your clock-in time will be recorded as $currentTime1. Are you ready to start your shift?',
+                          buttonText: 'Confirm Clock Out',
+                          ontap: () {
+                            clockOut(
+                                latitude: locationMessage ?? 0,
+                                longitude: locationMessage1 ?? 0);
+                          }),
+                      decorationColor: GlobalColors.kDeepPurple,
+                      text: 'Clock Out',
+                      textColor: GlobalColors.textWhiteColor),
             ),
           ),
         )
       ],
     );
+  }
+
+  void getImge() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      networkImg = preferences.getString('image') ?? '';
+      fullName = preferences.getString('name') ?? '';
+    });
+  }
+
+  Future<void> getRecentResults() async {
+    log('showerr......');
+    await ref.read(getRecentActivityProvider.notifier).getRecentResults();
+    final res = ref.read(getRecentActivityProvider).value;
+    log('showerr..1${res?.message}');
+    if (res == null) return;
+
+    if (res.status != 'success') {
+      showError(res.message);
+      log('showerr..2${res.message}');
+      return;
+    }
   }
 }

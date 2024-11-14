@@ -15,4 +15,21 @@ class ConnectionUrls {
 
   //setUpProfile
   static const String setupProfileEndpoint = '/api/v1/user/profile';
+  static const String setupWorkDaysEndpoint = '/api/v1/user/profile';
+
+  //clockIn and Out
+  static const String clockInEndpoint = '/api/v1/user/clock-in';
+  static const String clockOutEndpoint = '/api/v1/user/clock-out';
+
+  //get recentactivity
+  static const String getrecentActivityEndpoint =
+      '/api/v1/user/recent-activity';
+
+  //requestUser
+  static const String requestUserEndpoint = '/api/v1/user/request';
+  //settings
+  static const String managePasswordEndpoint = '/api/v1/user/passwords';
+  static const String updateProfileEndpoint = '/api/v1/user/profile';
+  static const String logoutEndpoint = '/api/v1/user/logout';
+  static const String registerDeviceEndpoint = '/api/v1/user/device/register';
 }

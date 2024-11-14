@@ -1,5 +1,6 @@
 import 'package:clockpath/color_theme/themes.dart';
-import 'package:clockpath/views/auth_screen/login_screen.dart';
+// import 'package:clockpath/views/auth_screen/login_screen.dart';
+import 'package:clockpath/views/main_screen/main_screen.dart';
 // import 'package:clockpath/views/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,4 +49,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Widget start = const LoginScreen();
+Widget start = const MainScreen();

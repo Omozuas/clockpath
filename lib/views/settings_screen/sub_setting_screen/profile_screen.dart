@@ -1,33 +1,44 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:clockpath/apis/riverPod/setup_profile_flow/setup_profile_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _roleController = TextEditingController();
 
   XFile? _profileImage;
-  String name = '';
+  String name = '', networkImg = '', person = '';
+  List<Map<String, dynamic>> images = [];
   late Uint8List bytes;
+  @override
+  void initState() {
+    super.initState();
+    getImge();
+  }
+
   @override
   void dispose() {
     _fullNameController.dispose();
@@ -35,15 +46,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
+  void getImge() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      networkImg = preferences.getString('image') ?? '';
+      _fullNameController.text = preferences.getString('name') ?? '';
+      _roleController.text = preferences.getString('role') ?? '';
+    });
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     name = pickedImage?.name ?? '';
     bytes = await pickedImage?.readAsBytes() ?? bytes;
+    images.add({"bytes": bytes, "path": name});
     setState(() {
       _profileImage = pickedImage;
-
-      log('path:$bytes,name:$name');
+      name = pickedImage!.name;
+      bytes = bytes;
     });
   }
 
@@ -59,8 +80,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // Validate and Sign Up
+  void proceed() async {
+    List<MapEntry<String, String>> formData = FormData({
+      "full_name": _fullNameController.text,
+      "role": _roleController.text,
+    }).fields;
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        await ref
+            .read(setupProfileProvider.notifier)
+            .setupProfilee(data: formData, images: images);
+        final res = ref.read(setupProfileProvider).setUpProfile.value;
+        if (res == null) return;
+        if (res.status == "success") {
+          showSuccess(
+            res.message,
+          );
+          getImge();
+        } else {
+          log(res.message);
+          showError(
+            res.message,
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+        showError(
+          e.toString(),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(setupProfileProvider).setUpProfile.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(
@@ -113,13 +168,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
-                                  image: _profileImage == null
-                                      ? const AssetImage(
-                                              'assets/icons/profile-circle.png')
-                                          as ImageProvider
-                                      : FileImage(
-                                          File(_profileImage!.path),
-                                        ),
+                                  image: networkImg.isEmpty
+                                      ? _profileImage == null
+                                          ? const AssetImage(
+                                                  'assets/icons/profile-circle.png')
+                                              as ImageProvider
+                                          : FileImage(
+                                              File(_profileImage!.path),
+                                            )
+                                      : NetworkImage(networkImg),
                                 ),
                               ),
                             ),
@@ -180,22 +237,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         CustomTextFields(
                           controller: _roleController,
                           firstText: 'Role/Title in Organization',
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your Role/Title in Organization';
-                            }
-                            return null;
-                          },
+                          // validator: (value) {
+                          //   if (value == null || value.isEmpty) {
+                          //     return 'Please enter your Role/Title in Organization';
+                          //   }
+                          //   return null;
+                          // },
                           hintText: 'Enter your Role/Title in Organization',
                           inputFormatters: [
                             FilteringTextInputFormatter.deny(RegExp(r'[,.]')),
                           ],
+                          readOnly: true,
                         ),
                         SizedBox(height: 70.h),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: CustomButton(
-                              onTap: () {},
+                              onTap: proceed,
+                              isLoading: isLoading,
                               decorationColor: GlobalColors.kDeepPurple,
                               text: 'Save Changes',
                               textColor: GlobalColors.textWhiteColor),

@@ -22,6 +22,7 @@ class CustomTextFields extends StatelessWidget {
     this.contentPadding,
     this.maxLength,
     this.maxLines = 1,
+    this.readOnly = false,
     this.extraText, // Optional callback for "Forgot Password?"
   });
   final String? firstText, hintText, extraText;
@@ -30,7 +31,7 @@ class CustomTextFields extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Widget? suffixIcon;
   final TextInputType? keyboardType;
-  final bool obscureText, autofocus;
+  final bool obscureText, autofocus, readOnly;
   final VoidCallback? onForgotPassword; // Callback for when the link is tapped
   final Function(String)? onChanged;
   final MaxLengthEnforcement? maxLengthEnforcement;
@@ -62,6 +63,7 @@ class CustomTextFields extends StatelessWidget {
           obscureText: obscureText,
           onChanged: onChanged,
           maxLengthEnforcement: maxLengthEnforcement,
+          readOnly: readOnly,
           decoration: InputDecoration(
             suffixIcon: suffixIcon,
             hintText: hintText,

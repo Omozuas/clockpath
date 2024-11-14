@@ -1,35 +1,40 @@
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/settings_provider/settings_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_dropdow.dart';
 import 'package:clockpath/common/custom_textfield.dart';
+import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/success_screens/request_submitted.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-class NewRequest extends StatefulWidget {
+class NewRequest extends ConsumerStatefulWidget {
   const NewRequest({super.key});
 
   @override
-  State<NewRequest> createState() => _NewRequestState();
+  ConsumerState<NewRequest> createState() => _NewRequestState();
 }
 
-class _NewRequestState extends State<NewRequest> {
+class _NewRequestState extends ConsumerState<NewRequest> {
   final TextEditingController requestType = TextEditingController();
   final TextEditingController note = TextEditingController();
-  String? clockInReminder;
-  String? clockOutReminder;
-  String? clockInReminder1;
+  String clockInReminder = '';
+  String startTime = '';
+  String stopTime = '';
   @override
   void initState() {
     super.initState();
+    dateTimeOptions = generateDateTimeList(); // Generate the time options
     // Listen to changes in both TextEditingControllers
-    requestType.addListener(areBothDropdownsSelected);
-    note.addListener(areBothDropdownsSelected);
+    requestType.addListener(() => setState(() => areBothDropdownsSelected()));
+    note.addListener(() => setState(() => areBothDropdownsSelected()));
   }
 
   @override
@@ -39,19 +44,83 @@ class _NewRequestState extends State<NewRequest> {
     super.dispose();
   }
 
+  // Generate list of date-time options from 6:00 AM today to the end of the year
+  List<String> generateDateTimeList() {
+    List<String> dateTimeList = [];
+    DateTime startDateTime = DateTime.now().add(Duration(
+      hours: 6 - DateTime.now().hour, // Set to the next 6:00 AM
+      minutes: -DateTime.now().minute,
+    ));
+    DateTime endDateTime =
+        DateTime(DateTime.now().year, 12, 31, 23, 59); // End at Dec 31, 23:59
+
+    final DateFormat displayFormat =
+        DateFormat("dd MMM yyyy HH:mm"); // Display format
+    while (startDateTime.isBefore(endDateTime)) {
+      dateTimeList.add(displayFormat
+          .format(startDateTime)); // Display as "12 Nov 2024 09:00"
+      startDateTime = startDateTime
+          .add(const Duration(minutes: 30)); // Increment by 30 minutes
+    }
+    return dateTimeList;
+  }
+
+  late List<String> dateTimeOptions;
+
   bool areBothDropdownsSelected() {
-    return clockInReminder != null &&
+    return clockInReminder.isNotEmpty &&
         clockInReminder != 'Select request type' &&
-        clockOutReminder != null &&
-        clockOutReminder != 'Select Date' &&
-        clockInReminder1 != null &&
-        clockInReminder1 != 'Select Date' &&
+        startTime.isNotEmpty &&
+        stopTime.isNotEmpty &&
         requestType.text.isNotEmpty &&
         note.text.isNotEmpty;
   }
 
+// Helper to find the ISO string for the selected display time
+  String? findISODateTime(String displayTime) {
+    final displayFormat = DateFormat("dd MMM yyyy HH:mm");
+    try {
+      DateTime dateTime = displayFormat.parse(displayTime);
+      return dateTime.toIso8601String(); // Convert to ISO 8601 format
+    } catch (e) {
+      log('Error parsing date: $e');
+      return null;
+    }
+  }
+
+  void proceed() async {
+    try {
+      await ref.read(settingsProvider.notifier).requestUser(
+          requestType: requestType.text,
+          reason: clockInReminder,
+          note: note.text,
+          startDate: startTime,
+          endDate: stopTime);
+      final res = ref.read(settingsProvider).requestUser.value;
+      if (res == null) return;
+      if (res.status == 'success') {
+        log(res.message);
+        showSuccess(
+          res.message,
+        );
+        Get.offAll(() => const RequestSubmitted());
+      } else {
+        log(res.message);
+        showError(
+          res.message,
+        );
+      }
+    } catch (e) {
+      log(e.toString());
+      showError(
+        e.toString(),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(settingsProvider).requestUser.isLoading;
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(
@@ -111,15 +180,26 @@ class _NewRequestState extends State<NewRequest> {
                         hintText: 'Select request type',
                         items: const [
                           'Select request type',
-                          '5 minutes before',
-                          '10 minutes before',
-                          '15 minutes before',
+                          'Vacation Leave',
+                          'Sick Leave',
+                          'Personal Leave',
+                          'Work From Home',
+                          'Bereavement Leave',
+                          'Jury Duty',
+                          'Parental Leave',
+                          'Medical Appointment',
+                          'Half-Day Leave',
+                          'Compensatory Off',
+                          'Training/Workshop',
+                          'Business Travel',
+                          'Public Holiday',
                         ], // List of items in the dropdown
                         initialValue:
                             'Select request type', // Initial selected value
                         onChanged: (value) {
                           setState(() {
-                            clockInReminder = value;
+                            clockInReminder = value!;
+                            areBothDropdownsSelected();
                           });
                         },
                       ),
@@ -133,17 +213,15 @@ class _NewRequestState extends State<NewRequest> {
                               hintText: 'Select Date',
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 5.w, vertical: 20.h),
-                              items: const [
-                                'Select Date',
-                                '5 minutes before',
-                                '10 minutes before',
-                                '15 minutes before',
-                              ], // List of items in the dropdown
-                              initialValue:
-                                  'Select Date', // Initial selected value
+                              items:
+                                  dateTimeOptions, // List of items in the dropdown
+                              initialValue: startTime.isNotEmpty
+                                  ? startTime
+                                  : null, // Initial selected value
                               onChanged: (value) {
                                 setState(() {
-                                  clockOutReminder = value;
+                                  startTime = findISODateTime(value!)!;
+                                  areBothDropdownsSelected();
                                 });
                               },
                             ),
@@ -155,18 +233,17 @@ class _NewRequestState extends State<NewRequest> {
                               hintText: 'Select Date',
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 5.w, vertical: 20.h),
-                              items: const [
-                                'Select Date',
-                                '5 minutes before',
-                                '10 minutes before',
-                                '15 minutes before',
-                              ], // List of items in the dropdown
-                              initialValue:
-                                  'Select Date', // Initial selected value
+                              items:
+                                  dateTimeOptions, // List of items in the dropdown
+                              initialValue: stopTime.isNotEmpty
+                                  ? stopTime
+                                  : null, // Initial selected value
                               onChanged: (value) {
                                 setState(() {
-                                  clockInReminder1 = value;
+                                  stopTime = findISODateTime(value!)!;
+                                  areBothDropdownsSelected();
                                 });
+                                log('Selected Stop Time (ISO 8601): $stopTime');
                               },
                             ),
                           ),
@@ -199,10 +276,9 @@ class _NewRequestState extends State<NewRequest> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: CustomButton(
+                          isLoading: isLoading,
                           onTap: areBothDropdownsSelected()
-                              ? () {
-                                  Get.offAll(() => const RequestSubmitted());
-                                }
+                              ? proceed
                               : () {
                                   log('Button is disabled');
                                 },

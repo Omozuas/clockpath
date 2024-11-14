@@ -6,6 +6,7 @@ import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/auth_screen/forgot_password_screen.dart';
+import 'package:clockpath/views/main_screen/main_screen.dart';
 import 'package:clockpath/views/set_up_profile_screen/set_up_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -28,6 +30,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isButtonEnabled = false;
   bool _isPasswordObscured = true;
+  String networkImg = '', fullName = '';
   @override
   void initState() {
     super.initState();
@@ -59,6 +62,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  void getImge() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(() {
+      networkImg = preferences.getString('image') ?? '';
+      fullName = preferences.getString('name') ?? '';
+    });
+    if (networkImg.isNotEmpty && fullName.isNotEmpty) {
+      Get.offAll(() => const MainScreen());
+    } else {
+      Get.offAll(() => const SetUpProfileScreen());
+    }
+  }
+
   // Validate and Sign Up
   void login() async {
     log(".....start");
@@ -75,7 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           showSuccess(
             res.message,
           );
-          Get.offAll(() => const SetUpProfileScreen());
+          getImge();
         } else {
           log(res.message);
           showError(
