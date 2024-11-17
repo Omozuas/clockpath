@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:clockpath/apis/models/get_request_model.dart';
+import 'package:clockpath/apis/models/get_workdays_model.dart';
 import 'package:clockpath/apis/models/recent_activity_model.dart';
 import 'package:clockpath/apis/respones/general_respons.dart';
 import 'package:clockpath/apis/services/api_services.dart';
@@ -73,6 +75,72 @@ class HomeApi {
       final message = err['message'];
       final requestErr = err['error'];
       return RecentActivityModel(
+        status: code ?? 'false',
+        message: message ?? requestErr ?? 'Something went wrong $e',
+      );
+    }
+  }
+
+  Future<GetRequestModel> getRequest({required double limit}) async {
+    final token = await getAccessToken();
+
+    try {
+      final response = await apiService.get(
+        endpoint: '${ConnectionUrls.requestUserEndpoint}?limit=$limit',
+        token: token,
+      );
+      final body = jsonDecode(response.body);
+
+      return GetRequestModel.fromJson(body);
+    } on TimeoutException catch (_) {
+      return GetRequestModel(
+        status: 'false',
+        message: 'Request Timeout',
+      );
+    } on SocketException catch (_) {
+      return GetRequestModel(
+        status: 'false',
+        message: 'No Internet connection',
+      );
+    } catch (e) {
+      final err = e as Map;
+      final code = err['code'];
+      final message = err['message'];
+      final requestErr = err['error'];
+      return GetRequestModel(
+        status: code ?? 'false',
+        message: message ?? requestErr ?? 'Something went wrong $e',
+      );
+    }
+  }
+
+  Future<GetWorkModel> getWorkDays() async {
+    final token = await getAccessToken();
+
+    try {
+      final response = await apiService.get(
+        endpoint: ConnectionUrls.workScheduleEndpoint,
+        token: token,
+      );
+      final body = jsonDecode(response.body);
+
+      return GetWorkModel.fromJson(body);
+    } on TimeoutException catch (_) {
+      return GetWorkModel(
+        status: 'false',
+        message: 'Request Timeout',
+      );
+    } on SocketException catch (_) {
+      return GetWorkModel(
+        status: 'false',
+        message: 'No Internet connection',
+      );
+    } catch (e) {
+      final err = e as Map;
+      final code = err['code'];
+      final message = err['message'];
+      final requestErr = err['error'];
+      return GetWorkModel(
         status: code ?? 'false',
         message: message ?? requestErr ?? 'Something went wrong $e',
       );

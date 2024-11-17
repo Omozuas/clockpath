@@ -1,20 +1,23 @@
+import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
+import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/views/requests/extra_screens/all_request.dart';
 import 'package:clockpath/views/requests/extra_screens/approved_request.dart';
 import 'package:clockpath/views/requests/extra_screens/pending_request.dart';
 import 'package:clockpath/views/requests/extra_screens/rejected_request.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class RequestsScreen extends StatefulWidget {
+class RequestsScreen extends ConsumerStatefulWidget {
   const RequestsScreen({super.key});
 
   @override
-  State<RequestsScreen> createState() => _RequestsScreenState();
+  ConsumerState<RequestsScreen> createState() => _RequestsScreenState();
 }
 
-class _RequestsScreenState extends State<RequestsScreen>
+class _RequestsScreenState extends ConsumerState<RequestsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -33,6 +36,8 @@ class _RequestsScreenState extends State<RequestsScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(getRecentActivityProvider);
+    ref.watch(getRequestProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
       child: Column(

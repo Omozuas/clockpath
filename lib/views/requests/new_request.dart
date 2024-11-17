@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
+import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/apis/riverPod/settings_provider/settings_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
@@ -121,6 +123,8 @@ class _NewRequestState extends ConsumerState<NewRequest> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(settingsProvider).requestUser.isLoading;
+    ref.watch(getRequestProvider);
+    ref.watch(getRecentActivityProvider);
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(

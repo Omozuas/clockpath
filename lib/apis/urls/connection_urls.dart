@@ -26,9 +26,10 @@ class ConnectionUrls {
       '/api/v1/user/recent-activity';
 
   //requestUser
-  static const String requestUserEndpoint = '/api/v1/user/request';
+  static const String requestUserEndpoint = '/api/v1/user/requests';
   //settings
   static const String managePasswordEndpoint = '/api/v1/user/passwords';
+  static const String workScheduleEndpoint = '/api/v1/user/work-schedule';
   static const String updateProfileEndpoint = '/api/v1/user/profile';
   static const String logoutEndpoint = '/api/v1/user/logout';
   static const String registerDeviceEndpoint = '/api/v1/user/device/register';

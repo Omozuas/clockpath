@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:clockpath/apis/models/recent_activity_model.dart';
 import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
+import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,7 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
       selectedDate = null;
     }
     final recentAct = ref.watch(getRecentActivityProvider);
+    ref.watch(getRequestProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Column(

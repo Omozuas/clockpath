@@ -44,7 +44,7 @@ class SettingsApi {
   }) async {
     final token = await getAccessToken();
     try {
-      final response = await apiService.put(
+      final response = await apiService.post(
           endpoint: ConnectionUrls.managePasswordEndpoint,
           token: token,
           body: {

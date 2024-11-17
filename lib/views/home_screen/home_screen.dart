@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
+import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
+import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/apis/riverPod/setup_profile_flow/setup_profile_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_bottomsheet.dart';
@@ -46,6 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     getstatusLocation();
     getImge();
     Future.microtask(() => getRecentResults());
+    // Future.microtask(() => getWorkingDays());
   }
 
   @override
@@ -258,11 +261,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     preferences.setString('isclockin', isThere);
   }
 
+  void getWorkingDays() async {
+    try {
+      await ref.read(getWorkDaysProvider.notifier).getWorkDays();
+      final res = ref.read(getWorkDaysProvider).value;
+      if (res == null) return;
+      if (res.status == "success") {
+      } else {
+        log(res.message);
+        showError(
+          res.message,
+        );
+      }
+    } catch (e) {
+      log(e.toString());
+      showError(
+        e.toString(),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.watch(setupProfileProvider).clockIn;
     ref.watch(setupProfileProvider).clockOut;
+    ref.watch(getRequestProvider);
     final recentAct = ref.watch(getRecentActivityProvider);
+    // final workDay = ref.watch(getWorkDaysProvider);
     return Stack(
       children: [
         SingleChildScrollView(
@@ -578,6 +603,196 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SizedBox(
                   height: 20.h,
                 ),
+                // workDay.when(
+                //     data: (work) {
+                //       final workDays = work?.data?.data?.workDays;
+
+                //       // Check if workDays is null or empty
+                //       if (workDays == null || workDays.isEmpty) {
+                //         return Center(
+                //           child: Text(
+                //             "Set your upcoming shift",
+                //             style: GoogleFonts.openSans(
+                //               fontSize: 16.sp, // Responsive font size
+                //               fontWeight: FontWeight.w600,
+                //               color: GlobalColors.textblackBoldColor,
+                //             ),
+                //           ),
+                //         );
+                //       }
+                //       // If workDays is not empty, render the ListView
+                //       return ListView.builder(
+                //         itemCount: 3,
+                //         shrinkWrap: true,
+                //         scrollDirection: Axis.vertical,
+                //         physics: const NeverScrollableScrollPhysics(),
+                //         itemBuilder: (context, index) {
+                //           final workDay = workDays[index];
+                //           final startTime = workDay.shift?.start ?? '';
+                //           final endTime = workDay.shift?.end ?? '';
+                //           final day = workDay.day ?? '';
+
+                //           String shiftLabel = getShiftLabel(startTime);
+                //           return Padding(
+                //             padding: EdgeInsets.only(
+                //                 bottom: 15.h), // Responsive padding
+                //             child: Container(
+                //               height: 113.h, // Responsive container height
+
+                //               decoration: BoxDecoration(
+                //                 border: Border.all(
+                //                   width: 1.w, // Responsive border width
+                //                   color: GlobalColors.lightGrayeColor,
+                //                 ),
+                //                 color: GlobalColors.backgroundColor2,
+                //                 borderRadius: BorderRadius.circular(
+                //                     16.r), // Responsive border radius
+                //               ),
+                //               padding: EdgeInsets.symmetric(
+                //                   vertical: 15.h,
+                //                   horizontal: 16.w), // Responsive padding
+                //               child: Row(
+                //                 children: [
+                //                   Expanded(
+                //                     child: Column(
+                //                       mainAxisAlignment:
+                //                           MainAxisAlignment.center,
+                //                       crossAxisAlignment:
+                //                           CrossAxisAlignment.start,
+                //                       children: [
+                //                         Container(
+                //                           height: 31.h, // Responsive height
+                //                           width: 109.w, // Responsive width
+                //                           padding: EdgeInsets.symmetric(
+                //                               vertical: 6.h,
+                //                               horizontal:
+                //                                   10.w), // Responsive padding
+                //                           decoration: BoxDecoration(
+                //                             color: GlobalColors.kLightpPurple,
+                //                             borderRadius: BorderRadius.circular(
+                //                                 16.r), // Responsive border radius
+                //                           ),
+                //                           child: Center(
+                //                             child: Text(
+                //                               shiftLabel,
+                //                               textAlign: TextAlign.center,
+                //                               style: GoogleFonts.openSans(
+                //                                 color: GlobalColors.kDeepPurple,
+                //                                 fontSize: 12
+                //                                     .sp, // Responsive font size
+                //                                 fontWeight: FontWeight.w400,
+                //                               ),
+                //                             ),
+                //                           ),
+                //                         ),
+                //                         SizedBox(
+                //                             height: 15.h), // Responsive spacing
+                //                         Text(
+                //                           day,
+                //                           textAlign: TextAlign.center,
+                //                           style: GoogleFonts.openSans(
+                //                             color:
+                //                                 GlobalColors.textblackBoldColor,
+                //                             fontSize:
+                //                                 14.sp, // Responsive font size
+                //                             fontWeight: FontWeight.w400,
+                //                           ),
+                //                         ),
+                //                       ],
+                //                     ),
+                //                   ),
+                //                   VerticalDivider(
+                //                     width: 1.w, // Responsive divider width
+                //                     indent: 8.h, // Responsive indent
+                //                     endIndent: 8.h, // Responsive end indent
+                //                     color: GlobalColors.lightGrayeColor,
+                //                   ),
+                //                   Expanded(
+                //                     child: Padding(
+                //                       padding: EdgeInsets.only(left: 15.w),
+                //                       child: Column(
+                //                         mainAxisAlignment:
+                //                             MainAxisAlignment.center,
+                //                         children: [
+                //                           Row(
+                //                             children: [
+                //                               Text(
+                //                                 'START :',
+                //                                 textAlign: TextAlign.center,
+                //                                 style: GoogleFonts.openSans(
+                //                                   color: GlobalColors
+                //                                       .textblackBoldColor
+                //                                       .withOpacity(0.5),
+                //                                   fontSize: 16
+                //                                       .sp, // Responsive font size
+                //                                   fontWeight: FontWeight.w600,
+                //                                 ),
+                //                               ),
+                //                               SizedBox(
+                //                                   width: 5
+                //                                       .w), // Responsive spacing between texts
+                //                               Text(
+                //                                 startTime,
+                //                                 textAlign: TextAlign.center,
+                //                                 style: GoogleFonts.openSans(
+                //                                   color: GlobalColors
+                //                                       .textblackSmallColor,
+                //                                   fontSize: 14
+                //                                       .sp, // Responsive font size
+                //                                   fontWeight: FontWeight.w600,
+                //                                 ),
+                //                               ),
+                //                             ],
+                //                           ),
+                //                           SizedBox(
+                //                               height:
+                //                                   15.h), // Responsive spacing
+                //                           Row(
+                //                             children: [
+                //                               Text(
+                //                                 'END :',
+                //                                 textAlign: TextAlign.center,
+                //                                 style: GoogleFonts.openSans(
+                //                                   color: GlobalColors
+                //                                       .textblackBoldColor
+                //                                       .withOpacity(0.5),
+                //                                   fontSize: 16
+                //                                       .sp, // Responsive font size
+                //                                   fontWeight: FontWeight.w600,
+                //                                 ),
+                //                               ),
+                //                               SizedBox(
+                //                                   width: 5
+                //                                       .w), // Responsive spacing between texts
+                //                               Text(
+                //                                 endTime,
+                //                                 textAlign: TextAlign.center,
+                //                                 style: GoogleFonts.openSans(
+                //                                   color: GlobalColors
+                //                                       .textblackSmallColor,
+                //                                   fontSize: 14
+                //                                       .sp, // Responsive font size
+                //                                   fontWeight: FontWeight.w600,
+                //                                 ),
+                //                               ),
+                //                             ],
+                //                           ),
+                //                         ],
+                //                       ),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //             ),
+                //           );
+                //         },
+                //       );
+                //     },
+                //     error: (e, s) {
+                //       return Text('$e,$s');
+                //     },
+                //     loading: () => const Text('..loading')),
+
                 ListView.builder(
                   itemCount: 3,
                   shrinkWrap: true,
@@ -834,35 +1049,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             if (info == null) {
                               return SizedBox(
                                 height: 180.h,
-                                child: Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'No Clock History Yet',
-                                        textAlign: TextAlign.center,
-                                        softWrap: true,
-                                        style: GoogleFonts.openSans(
-                                          color:
-                                              GlobalColors.textblackBoldColor,
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'No Clock History Yet',
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      style: GoogleFonts.openSans(
+                                        color: GlobalColors.textblackBoldColor,
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      SizedBox(height: 20.h),
-                                      Text(
-                                        'You havent clocked in yet. Start your first shift to see your work hours here',
-                                        textAlign: TextAlign.center,
-                                        softWrap: true,
-                                        style: GoogleFonts.openSans(
-                                          color:
-                                              GlobalColors.textblackSmallColor,
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w400,
-                                        ),
+                                    ),
+                                    SizedBox(height: 20.h),
+                                    Text(
+                                      'You havent clocked in yet. Start your first shift to see your work hours here',
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
+                                      style: GoogleFonts.openSans(
+                                        color: GlobalColors.textblackSmallColor,
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               );
                             }
@@ -1103,5 +1314,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       log('showerr..2${res.message}');
       return;
     }
+  }
+
+  // Function to determine the shift label
+  String getShiftLabel(String time) {
+    if (time.isEmpty) return 'Unknown Shift';
+
+    final parts = time.split(':');
+    if (parts.length < 2) return 'Unknown Shift';
+
+    final hour = int.tryParse(parts[0]) ?? 0;
+
+    if (hour >= 6 && hour < 12) return 'Morning Shift';
+    if (hour >= 12 && hour < 16) return 'Afternoon Shift';
+    if (hour >= 16 && hour < 19) return 'Evening Shift';
+    return 'Night Shift';
   }
 }
