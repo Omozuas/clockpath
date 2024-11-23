@@ -1,5 +1,7 @@
+import 'package:clockpath/apis/riverPod/get_notification/get_notification_provider.dart';
 import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
 import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
+import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/views/requests/extra_screens/all_request.dart';
 import 'package:clockpath/views/requests/extra_screens/approved_request.dart';
@@ -38,6 +40,8 @@ class _RequestsScreenState extends ConsumerState<RequestsScreen>
   Widget build(BuildContext context) {
     ref.watch(getRecentActivityProvider);
     ref.watch(getRequestProvider);
+    ref.watch(getWorkDaysProvider);
+    ref.watch(getNotificationProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
       child: Column(

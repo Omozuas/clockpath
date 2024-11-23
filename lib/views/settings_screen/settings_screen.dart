@@ -1,5 +1,9 @@
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/get_notification/get_notification_provider.dart';
+import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
+import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
+import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/apis/riverPod/settings_provider/settings_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_listTile.dart';
@@ -69,6 +73,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(settingsProvider).logOut.isLoading;
+    ref.watch(getRequestProvider);
+    ref.watch(getRecentActivityProvider);
+    ref.watch(getWorkDaysProvider);
+    ref.watch(getNotificationProvider);
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(

@@ -1,14 +1,18 @@
 import 'dart:developer';
 
 import 'package:clockpath/apis/models/recent_activity_model.dart';
+import 'package:clockpath/apis/riverPod/get_notification/get_notification_provider.dart';
 import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
 import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
+import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/clock_history_screen/result_history.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:intl/intl.dart';
@@ -68,14 +72,19 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
         ),
       ),
     );
+    log('datetime $dateTime');
+
     if (dateTime != null) {
       setState(() {
         selectedDate = dateTime;
+
         showDatePickerFlag = true;
         new1 = dateFormat.format(selectedDate!);
         getFilteredResults();
       });
+      log('selectedDate1 $selectedDate');
     }
+    log('selectedDate $selectedDate');
   }
 
   @override
@@ -107,7 +116,7 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
     if (selectedDate == null || allResults == null) return allResults ?? [];
 
     // Format `selectedDate` to match the `Result.date` format
-    final formattedSelectedDate = DateFormat('MM/d/yyyy').format(selectedDate!);
+    final formattedSelectedDate = DateFormat('d/M/yyy').format(selectedDate!);
     log(formattedSelectedDate);
     // Filter the results based on the selected date
     final filteredResults = allResults!
@@ -119,6 +128,13 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
 
     // Log each filtered result
     for (var result in filteredResults) {
+      if (result.clockInTime != null) {
+        Get.to(() => const ResultHistory(), arguments: {
+          'date': result.date,
+          'clockInTime': result.clockInTime,
+          'clockOutTime': result.clockOutTime
+        });
+      }
       log('Filtered Result - Date: ${result.date}, Clock In: ${result.clockInTime}, Clock Out: ${result.clockOutTime}, Status: ${result.status}, Hours Worked: ${result.hoursWorked}');
     }
 
@@ -135,6 +151,9 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
     }
     final recentAct = ref.watch(getRecentActivityProvider);
     ref.watch(getRequestProvider);
+    ref.watch(getWorkDaysProvider);
+    ref.watch(getRequestProvider);
+    ref.watch(getNotificationProvider);
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Column(
@@ -281,9 +300,29 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
                       skipLoadingOnRefresh: true,
                       data: (data) {
                         // Use the filtered results based on `selectedDate`
-                        var filteredResults = getFilteredResults();
+                        // var filteredResults = getFilteredResults();
+                        // Use the filtered results based on `selectedDate`
+                        // var filteredResults = getFilteredResults();
+// Get all results from the API response
+                        final allResults = data?.data?.results ?? [];
+                        log('selectedDate3 $selectedDate');
+                        // Reorder the results to move the selected date to the top
+                        List<Result> reorderedResults = List.from(allResults);
+                        if (selectedDate != null) {
+                          final formattedSelectedDate =
+                              DateFormat('d/M/yyyy').format(selectedDate!);
+                          log('$formattedSelectedDate hhh');
+                          reorderedResults.sort((a, b) {
+                            if (a.date == formattedSelectedDate) {
+                              return -1; // Move the selected date to the top
+                            } else if (b.date == formattedSelectedDate) {
+                              return 1;
+                            }
+                            return 0; // Keep the rest in their original order
+                          });
+                        }
 
-                        if (filteredResults.isEmpty) {
+                        if (allResults.isEmpty) {
                           return Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -315,12 +354,11 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
                         }
                         return Expanded(
                           child: ListView.builder(
-                              itemCount: filteredResults.length,
-                              shrinkWrap: true,
+                              itemCount: allResults.length,
                               scrollDirection: Axis.vertical,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {
-                                final item = filteredResults[index];
+                                final item = allResults[index];
 
                                 return Container(
                                   decoration: BoxDecoration(

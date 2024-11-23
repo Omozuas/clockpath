@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'dart:io';
+
+import 'package:clockpath/apis/models/get_reminder.dart';
 import 'package:clockpath/apis/respones/general_respons.dart';
 import 'package:clockpath/apis/services/api_services.dart';
 import 'package:clockpath/apis/urls/connection_urls.dart';
@@ -85,6 +89,58 @@ class SettingsApi {
       return response!;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<GeneralRespons> reminder(
+      {required String clockInReminder,
+      required String clockOutReminder}) async {
+    final token = await getAccessToken();
+    try {
+      final response = await apiService.post(
+          endpoint: ConnectionUrls.reminderEndpoint,
+          token: token,
+          body: {
+            "clockInReminder": clockInReminder,
+            "clockOutReminder": clockOutReminder
+          });
+
+      return response!;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<ReminderModel> getReminder() async {
+    final token = await getAccessToken();
+
+    try {
+      final response = await apiService.get(
+        endpoint: ConnectionUrls.reminderEndpoint,
+        token: token,
+      );
+      final body = jsonDecode(response.body);
+
+      return ReminderModel.fromJson(body);
+    } on TimeoutException catch (_) {
+      return ReminderModel(
+        status: 'false',
+        message: 'Request Timeout',
+      );
+    } on SocketException catch (_) {
+      return ReminderModel(
+        status: 'false',
+        message: 'No Internet connection',
+      );
+    } catch (e) {
+      final err = e as Map;
+      final code = err['code'];
+      final message = err['message'];
+      final requestErr = err['error'];
+      return ReminderModel(
+        status: code ?? 'false',
+        message: message ?? requestErr ?? 'Something went wrong $e',
+      );
     }
   }
 

@@ -27,10 +27,13 @@ class ConnectionUrls {
 
   //requestUser
   static const String requestUserEndpoint = '/api/v1/user/requests';
+  //notification
+  static const String notificationEndpoint = '/api/v1/user/notifications';
   //settings
   static const String managePasswordEndpoint = '/api/v1/user/passwords';
   static const String workScheduleEndpoint = '/api/v1/user/work-schedule';
   static const String updateProfileEndpoint = '/api/v1/user/profile';
   static const String logoutEndpoint = '/api/v1/user/logout';
   static const String registerDeviceEndpoint = '/api/v1/user/device/register';
+  static const String reminderEndpoint = '/api/v1/user/reminder';
 }

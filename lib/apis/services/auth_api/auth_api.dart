@@ -155,7 +155,7 @@ class AuthServices {
   }
 
   void saveUserDids(GeneralRespons? response) async {
-    if (response == null) return;
+    if (response!.success == false) return;
     final image = response.data["user"]["image"]["imageUrl"];
     final name = response.data["user"]["full_name"];
     final preferences = await SharedPreferences.getInstance();

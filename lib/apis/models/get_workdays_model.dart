@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 GetWorkModel? getWorkModelFromJson(String str) =>
@@ -89,22 +90,51 @@ class DataData {
 
 class WorkDay {
   String? day;
+  String? date;
   Shift? shift;
 
   WorkDay({
     this.day,
+    this.date,
     this.shift,
   });
 
   factory WorkDay.fromJson(Map<String, dynamic> json) => WorkDay(
         day: json["day"],
+        date: json["date"],
         shift: json["shift"] != null ? Shift.fromJson(json["shift"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
         "day": day,
+        "date": date,
         "shift": shift?.toJson(),
       };
+
+  WorkDay copyWith({
+    String? day,
+    String? date,
+    Shift? shift,
+  }) {
+    return WorkDay(
+      day: day ?? this.day,
+      date: date ?? this.date,
+      shift: shift ?? this.shift,
+    );
+  }
+
+  @override
+  String toString() => 'WorkDay(day: $day, date: $date, shift: $shift)';
+
+  @override
+  bool operator ==(covariant WorkDay other) {
+    if (identical(this, other)) return true;
+
+    return other.day == day && other.date == date && other.shift == shift;
+  }
+
+  @override
+  int get hashCode => day.hashCode ^ date.hashCode ^ shift.hashCode;
 }
 
 class Shift {

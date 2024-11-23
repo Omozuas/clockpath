@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:clockpath/apis/riverPod/get_notification/get_notification_provider.dart';
 import 'package:clockpath/apis/riverPod/setup_profile_flow/setup_profile_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
@@ -116,6 +117,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(setupProfileProvider).setUpProfile.isLoading;
+    ref.watch(getNotificationProvider);
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'dart:io';
 
+import 'package:clockpath/apis/models/get_notification.dart';
 import 'package:clockpath/apis/models/get_request_model.dart';
 import 'package:clockpath/apis/models/get_workdays_model.dart';
 import 'package:clockpath/apis/models/recent_activity_model.dart';
@@ -108,6 +110,38 @@ class HomeApi {
       final message = err['message'];
       final requestErr = err['error'];
       return GetRequestModel(
+        status: code ?? 'false',
+        message: message ?? requestErr ?? 'Something went wrong $e',
+      );
+    }
+  }
+
+  Future<NotificationModel> getNotification({required double limit}) async {
+    final token = await getAccessToken();
+
+    try {
+      final response = await apiService.get(
+        endpoint: '${ConnectionUrls.notificationEndpoint}?limit=$limit',
+        token: token,
+      );
+      final body = jsonDecode(response.body);
+      return NotificationModel.fromJson(body);
+    } on TimeoutException catch (_) {
+      return NotificationModel(
+        status: 'false',
+        message: 'Request Timeout',
+      );
+    } on SocketException catch (_) {
+      return NotificationModel(
+        status: 'false',
+        message: 'No Internet connection',
+      );
+    } catch (e) {
+      final err = e as Map;
+      final code = err['code'];
+      final message = err['message'];
+      final requestErr = err['error'];
+      return NotificationModel(
         status: code ?? 'false',
         message: message ?? requestErr ?? 'Something went wrong $e',
       );

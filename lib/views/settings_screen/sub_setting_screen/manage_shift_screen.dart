@@ -6,7 +6,6 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_dropdow.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
-import 'package:clockpath/views/set_up_profile_screen/reminder_preference_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -50,6 +49,7 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
   };
   // Validate and Sign Up
   void proceed() async {
+    log('start');
     work.clear();
     try {
       if (mondayStart.isNotEmpty && mondayEnd.isNotEmpty) {
@@ -101,7 +101,7 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
         showSuccess(
           res.message,
         );
-        Get.to(() => const ReminderPreferenceScreen());
+        // Get.to(() => const ReminderPreferenceScreen());
         work.clear();
       } else {
         log(res.message);
@@ -821,7 +821,7 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: CustomButton(
-                            onTap: () {},
+                            onTap: proceed,
                             isLoading: isLoading,
                             decorationColor: GlobalColors.kDeepPurple,
                             text: 'Save Changes',

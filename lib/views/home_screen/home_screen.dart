@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:clockpath/apis/riverPod/get_notification/get_notification_provider.dart';
 import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.dart';
 import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
@@ -9,6 +10,7 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_bottomsheet.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/controller/main_controller/main_controller.dart';
 import 'package:clockpath/views/settings_screen/settings_screen.dart';
 import 'package:clockpath/views/settings_screen/sub_setting_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -81,14 +83,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void clockIn({required double latitude, required double longitude}) async {
     try {
-      log('...$latitude,$longitude');
       await ref
           .read(setupProfileProvider.notifier)
           .clockIn(longitude: longitude, latitude: latitude);
       final res = ref.read(setupProfileProvider).clockIn.value;
       if (res == null) return;
       if (res.status == "success") {
-        log('...success');
         statusLocation(isThere: 'true');
         getstatusLocation();
         showSuccess(res.message);
@@ -286,8 +286,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.watch(setupProfileProvider).clockIn;
     ref.watch(setupProfileProvider).clockOut;
     ref.watch(getRequestProvider);
+    ref.watch(getNotificationProvider);
     final recentAct = ref.watch(getRecentActivityProvider);
-    // final workDay = ref.watch(getWorkDaysProvider);
+    final workDay = ref.watch(getWorkDaysProvider);
+    final controller = Get.put(MainController());
     return Stack(
       children: [
         SingleChildScrollView(
@@ -408,18 +410,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       borderRadius: BorderRadius.circular(
                                           16.r), // Responsive border radius
                                     ),
-                                    child: Center(
-                                      child: Text(
-                                        'Clocked Out',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.openSans(
-                                          color: GlobalColors.kDeepPurple,
-                                          fontSize:
-                                              12.sp, // Responsive font size
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
+                                    child: isClockedIn == true
+                                        ? Center(
+                                            child: Text(
+                                              'Clocked Out',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.openSans(
+                                                color: GlobalColors.kDeepPurple,
+                                                fontSize: 12
+                                                    .sp, // Responsive font size
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          )
+                                        : Center(
+                                            child: Text(
+                                              'Clocked In',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.openSans(
+                                                color: GlobalColors.kDeepPurple,
+                                                fontSize: 12
+                                                    .sp, // Responsive font size
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ),
                                   )
                                 ],
                               ),
@@ -603,348 +618,197 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SizedBox(
                   height: 20.h,
                 ),
-                // workDay.when(
-                //     data: (work) {
-                //       final workDays = work?.data?.data?.workDays;
+                workDay.when(
+                    skipLoadingOnRefresh: true,
+                    skipLoadingOnReload: true,
+                    data: (work) {
+                      final workDays = work?.data?.data?.workDays;
 
-                //       // Check if workDays is null or empty
-                //       if (workDays == null || workDays.isEmpty) {
-                //         return Center(
-                //           child: Text(
-                //             "Set your upcoming shift",
-                //             style: GoogleFonts.openSans(
-                //               fontSize: 16.sp, // Responsive font size
-                //               fontWeight: FontWeight.w600,
-                //               color: GlobalColors.textblackBoldColor,
-                //             ),
-                //           ),
-                //         );
-                //       }
-                //       // If workDays is not empty, render the ListView
-                //       return ListView.builder(
-                //         itemCount: 3,
-                //         shrinkWrap: true,
-                //         scrollDirection: Axis.vertical,
-                //         physics: const NeverScrollableScrollPhysics(),
-                //         itemBuilder: (context, index) {
-                //           final workDay = workDays[index];
-                //           final startTime = workDay.shift?.start ?? '';
-                //           final endTime = workDay.shift?.end ?? '';
-                //           final day = workDay.day ?? '';
-
-                //           String shiftLabel = getShiftLabel(startTime);
-                //           return Padding(
-                //             padding: EdgeInsets.only(
-                //                 bottom: 15.h), // Responsive padding
-                //             child: Container(
-                //               height: 113.h, // Responsive container height
-
-                //               decoration: BoxDecoration(
-                //                 border: Border.all(
-                //                   width: 1.w, // Responsive border width
-                //                   color: GlobalColors.lightGrayeColor,
-                //                 ),
-                //                 color: GlobalColors.backgroundColor2,
-                //                 borderRadius: BorderRadius.circular(
-                //                     16.r), // Responsive border radius
-                //               ),
-                //               padding: EdgeInsets.symmetric(
-                //                   vertical: 15.h,
-                //                   horizontal: 16.w), // Responsive padding
-                //               child: Row(
-                //                 children: [
-                //                   Expanded(
-                //                     child: Column(
-                //                       mainAxisAlignment:
-                //                           MainAxisAlignment.center,
-                //                       crossAxisAlignment:
-                //                           CrossAxisAlignment.start,
-                //                       children: [
-                //                         Container(
-                //                           height: 31.h, // Responsive height
-                //                           width: 109.w, // Responsive width
-                //                           padding: EdgeInsets.symmetric(
-                //                               vertical: 6.h,
-                //                               horizontal:
-                //                                   10.w), // Responsive padding
-                //                           decoration: BoxDecoration(
-                //                             color: GlobalColors.kLightpPurple,
-                //                             borderRadius: BorderRadius.circular(
-                //                                 16.r), // Responsive border radius
-                //                           ),
-                //                           child: Center(
-                //                             child: Text(
-                //                               shiftLabel,
-                //                               textAlign: TextAlign.center,
-                //                               style: GoogleFonts.openSans(
-                //                                 color: GlobalColors.kDeepPurple,
-                //                                 fontSize: 12
-                //                                     .sp, // Responsive font size
-                //                                 fontWeight: FontWeight.w400,
-                //                               ),
-                //                             ),
-                //                           ),
-                //                         ),
-                //                         SizedBox(
-                //                             height: 15.h), // Responsive spacing
-                //                         Text(
-                //                           day,
-                //                           textAlign: TextAlign.center,
-                //                           style: GoogleFonts.openSans(
-                //                             color:
-                //                                 GlobalColors.textblackBoldColor,
-                //                             fontSize:
-                //                                 14.sp, // Responsive font size
-                //                             fontWeight: FontWeight.w400,
-                //                           ),
-                //                         ),
-                //                       ],
-                //                     ),
-                //                   ),
-                //                   VerticalDivider(
-                //                     width: 1.w, // Responsive divider width
-                //                     indent: 8.h, // Responsive indent
-                //                     endIndent: 8.h, // Responsive end indent
-                //                     color: GlobalColors.lightGrayeColor,
-                //                   ),
-                //                   Expanded(
-                //                     child: Padding(
-                //                       padding: EdgeInsets.only(left: 15.w),
-                //                       child: Column(
-                //                         mainAxisAlignment:
-                //                             MainAxisAlignment.center,
-                //                         children: [
-                //                           Row(
-                //                             children: [
-                //                               Text(
-                //                                 'START :',
-                //                                 textAlign: TextAlign.center,
-                //                                 style: GoogleFonts.openSans(
-                //                                   color: GlobalColors
-                //                                       .textblackBoldColor
-                //                                       .withOpacity(0.5),
-                //                                   fontSize: 16
-                //                                       .sp, // Responsive font size
-                //                                   fontWeight: FontWeight.w600,
-                //                                 ),
-                //                               ),
-                //                               SizedBox(
-                //                                   width: 5
-                //                                       .w), // Responsive spacing between texts
-                //                               Text(
-                //                                 startTime,
-                //                                 textAlign: TextAlign.center,
-                //                                 style: GoogleFonts.openSans(
-                //                                   color: GlobalColors
-                //                                       .textblackSmallColor,
-                //                                   fontSize: 14
-                //                                       .sp, // Responsive font size
-                //                                   fontWeight: FontWeight.w600,
-                //                                 ),
-                //                               ),
-                //                             ],
-                //                           ),
-                //                           SizedBox(
-                //                               height:
-                //                                   15.h), // Responsive spacing
-                //                           Row(
-                //                             children: [
-                //                               Text(
-                //                                 'END :',
-                //                                 textAlign: TextAlign.center,
-                //                                 style: GoogleFonts.openSans(
-                //                                   color: GlobalColors
-                //                                       .textblackBoldColor
-                //                                       .withOpacity(0.5),
-                //                                   fontSize: 16
-                //                                       .sp, // Responsive font size
-                //                                   fontWeight: FontWeight.w600,
-                //                                 ),
-                //                               ),
-                //                               SizedBox(
-                //                                   width: 5
-                //                                       .w), // Responsive spacing between texts
-                //                               Text(
-                //                                 endTime,
-                //                                 textAlign: TextAlign.center,
-                //                                 style: GoogleFonts.openSans(
-                //                                   color: GlobalColors
-                //                                       .textblackSmallColor,
-                //                                   fontSize: 14
-                //                                       .sp, // Responsive font size
-                //                                   fontWeight: FontWeight.w600,
-                //                                 ),
-                //                               ),
-                //                             ],
-                //                           ),
-                //                         ],
-                //                       ),
-                //                     ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             ),
-                //           );
-                //         },
-                //       );
-                //     },
-                //     error: (e, s) {
-                //       return Text('$e,$s');
-                //     },
-                //     loading: () => const Text('..loading')),
-
-                ListView.builder(
-                  itemCount: 3,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding:
-                          EdgeInsets.only(bottom: 15.h), // Responsive padding
-                      child: Container(
-                        height: 113.h, // Responsive container height
-
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1.w, // Responsive border width
-                            color: GlobalColors.lightGrayeColor,
+                      // Check if workDays is null or empty
+                      if (workDays == null || workDays.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "Set your upcoming shift",
+                            style: GoogleFonts.openSans(
+                              fontSize: 16.sp, // Responsive font size
+                              fontWeight: FontWeight.w600,
+                              color: GlobalColors.textblackBoldColor,
+                            ),
                           ),
-                          color: GlobalColors.backgroundColor2,
-                          borderRadius: BorderRadius.circular(
-                              16.r), // Responsive border radius
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 15.h,
-                            horizontal: 16.w), // Responsive padding
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        );
+                      }
+                      // If workDays is not empty, render the ListView
+                      return ListView.builder(
+                        itemCount: 3,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final workDay = workDays[index];
+                          final startTime = workDay.shift?.start ?? '';
+                          final endTime = workDay.shift?.end ?? '';
+                          final date = workDay.date ?? '';
+
+                          String shiftLabel = getShiftLabel(startTime);
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                bottom: 15.h), // Responsive padding
+                            child: Container(
+                              height: 113.h, // Responsive container height
+
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 1.w, // Responsive border width
+                                  color: GlobalColors.lightGrayeColor,
+                                ),
+                                color: GlobalColors.backgroundColor2,
+                                borderRadius: BorderRadius.circular(
+                                    16.r), // Responsive border radius
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15.h,
+                                  horizontal: 16.w), // Responsive padding
+                              child: Row(
                                 children: [
-                                  Container(
-                                    height: 31.h, // Responsive height
-                                    width: 109.w, // Responsive width
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 6.h,
-                                        horizontal: 10.w), // Responsive padding
-                                    decoration: BoxDecoration(
-                                      color: GlobalColors.kLightpPurple,
-                                      borderRadius: BorderRadius.circular(
-                                          16.r), // Responsive border radius
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Morning Shift',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.openSans(
-                                          color: GlobalColors.kDeepPurple,
-                                          fontSize:
-                                              12.sp, // Responsive font size
-                                          fontWeight: FontWeight.w400,
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 31.h, // Responsive height
+                                          width: 109.w, // Responsive width
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 6.h,
+                                              horizontal:
+                                                  10.w), // Responsive padding
+                                          decoration: BoxDecoration(
+                                            color: GlobalColors.kLightpPurple,
+                                            borderRadius: BorderRadius.circular(
+                                                16.r), // Responsive border radius
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              shiftLabel,
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.openSans(
+                                                color: GlobalColors.kDeepPurple,
+                                                fontSize: 12
+                                                    .sp, // Responsive font size
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                        SizedBox(
+                                            height: 15.h), // Responsive spacing
+                                        Text(
+                                          date,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.openSans(
+                                            color:
+                                                GlobalColors.textblackBoldColor,
+                                            fontSize:
+                                                14.sp, // Responsive font size
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(height: 15.h), // Responsive spacing
-                                  Text(
-                                    'Tue 18th Jun, 2025',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.openSans(
-                                      color: GlobalColors.textblackBoldColor,
-                                      fontSize: 14.sp, // Responsive font size
-                                      fontWeight: FontWeight.w400,
+                                  VerticalDivider(
+                                    width: 1.w, // Responsive divider width
+                                    indent: 8.h, // Responsive indent
+                                    endIndent: 8.h, // Responsive end indent
+                                    color: GlobalColors.lightGrayeColor,
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 15.w),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'START :',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.openSans(
+                                                  color: GlobalColors
+                                                      .textblackBoldColor
+                                                      .withOpacity(0.5),
+                                                  fontSize: 16
+                                                      .sp, // Responsive font size
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  width: 5
+                                                      .w), // Responsive spacing between texts
+                                              Text(
+                                                startTime,
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.openSans(
+                                                  color: GlobalColors
+                                                      .textblackSmallColor,
+                                                  fontSize: 14
+                                                      .sp, // Responsive font size
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                              height:
+                                                  15.h), // Responsive spacing
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'END :',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.openSans(
+                                                  color: GlobalColors
+                                                      .textblackBoldColor
+                                                      .withOpacity(0.5),
+                                                  fontSize: 16
+                                                      .sp, // Responsive font size
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  width: 5
+                                                      .w), // Responsive spacing between texts
+                                              Text(
+                                                endTime,
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.openSans(
+                                                  color: GlobalColors
+                                                      .textblackSmallColor,
+                                                  fontSize: 14
+                                                      .sp, // Responsive font size
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            VerticalDivider(
-                              width: 1.w, // Responsive divider width
-                              indent: 8.h, // Responsive indent
-                              endIndent: 8.h, // Responsive end indent
-                              color: GlobalColors.lightGrayeColor,
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 15.w),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'START :',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.openSans(
-                                            color: GlobalColors
-                                                .textblackBoldColor
-                                                .withOpacity(0.5),
-                                            fontSize:
-                                                16.sp, // Responsive font size
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            width: 5
-                                                .w), // Responsive spacing between texts
-                                        Text(
-                                          '09:00 AM',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.openSans(
-                                            color: GlobalColors
-                                                .textblackSmallColor,
-                                            fontSize:
-                                                14.sp, // Responsive font size
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                        height: 15.h), // Responsive spacing
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'END :',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.openSans(
-                                            color: GlobalColors
-                                                .textblackBoldColor
-                                                .withOpacity(0.5),
-                                            fontSize:
-                                                16.sp, // Responsive font size
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            width: 5
-                                                .w), // Responsive spacing between texts
-                                        Text(
-                                          '05:00 PM',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.openSans(
-                                            color: GlobalColors
-                                                .textblackSmallColor,
-                                            fontSize:
-                                                14.sp, // Responsive font size
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                          );
+                        },
+                      );
+                    },
+                    error: (e, s) {
+                      return Text('$e,$s');
+                    },
+                    loading: () => const Text('..loading')),
                 SizedBox(
                   height: 20.h,
                 ),
@@ -961,14 +825,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Text(
-                      'See All',
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      style: GoogleFonts.openSans(
-                        color: GlobalColors.kDeepPurple,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () => controller.mainIndex.value = 1,
+                      child: Text(
+                        'See All',
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        style: GoogleFonts.openSans(
+                          color: GlobalColors.kDeepPurple,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

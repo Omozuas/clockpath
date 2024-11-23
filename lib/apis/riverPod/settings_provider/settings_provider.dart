@@ -10,7 +10,7 @@ class SettingsProvider extends AutoDisposeNotifier<SettingsProviderStates> {
       managePassword: AsyncData(null),
       logOut: AsyncData(null),
       registerDevice: AsyncData(null),
-      // oneTimePin: AsyncData(null),
+      reminder: AsyncData(null),
       // resetPassword: AsyncData(null)
     );
   }
@@ -83,17 +83,20 @@ class SettingsProvider extends AutoDisposeNotifier<SettingsProviderStates> {
     }
   }
 
-  // Future<void> oneTimePin({required String otp}) async {
-  //   final auth = ref.read(authServicesProvider);
-  //   try {
-  //     state = state.copyWith(oneTimePin: const AsyncLoading());
-  //     final response = await auth.oneTimePin(otp: otp);
-  //     state = state.copyWith(oneTimePin: AsyncData(response));
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //         oneTimePin: AsyncError(e.toString(), StackTrace.current));
-  //   }
-  // }
+  Future<void> reminder(
+      {required String clockInReminder,
+      required String clockOutReminder}) async {
+    final auth = ref.read(settingsApi);
+    try {
+      state = state.copyWith(reminder: const AsyncLoading());
+      final response = await auth.reminder(
+          clockInReminder: clockInReminder, clockOutReminder: clockOutReminder);
+      state = state.copyWith(reminder: AsyncData(response));
+    } catch (e) {
+      state = state.copyWith(
+          reminder: AsyncError(e.toString(), StackTrace.current));
+    }
+  }
 
   // Future<void> resetPassword(
   //     {required String newPassword, required String confirmPassword}) async {
@@ -119,14 +122,14 @@ class SettingsProviderStates {
   final AsyncValue<GeneralRespons?> managePassword;
   final AsyncValue<GeneralRespons?> logOut;
   final AsyncValue<GeneralRespons?> registerDevice;
-  // final AsyncValue<GeneralRespons?> oneTimePin;
+  final AsyncValue<GeneralRespons?> reminder;
   // final AsyncValue<GeneralRespons?> resetPassword;
   const SettingsProviderStates({
     required this.requestUser,
     required this.managePassword,
     required this.logOut,
     required this.registerDevice,
-    // required this.oneTimePin,
+    required this.reminder,
     // required this.resetPassword
   });
   SettingsProviderStates copyWith({
@@ -134,7 +137,7 @@ class SettingsProviderStates {
     AsyncValue<GeneralRespons?>? managePassword,
     AsyncValue<GeneralRespons?>? logOut,
     AsyncValue<GeneralRespons?>? registerDevice,
-    // AsyncValue<GeneralRespons?>? oneTimePin,
+    AsyncValue<GeneralRespons?>? reminder,
     // AsyncValue<GeneralRespons?>? resetPassword,
   }) {
     return SettingsProviderStates(
@@ -142,7 +145,7 @@ class SettingsProviderStates {
       managePassword: managePassword ?? this.managePassword,
       logOut: logOut ?? this.logOut,
       registerDevice: registerDevice ?? this.registerDevice,
-      // oneTimePin: oneTimePin ?? this.oneTimePin,
+      reminder: reminder ?? this.reminder,
       // resetPassword: resetPassword ?? this.resetPassword
     );
   }

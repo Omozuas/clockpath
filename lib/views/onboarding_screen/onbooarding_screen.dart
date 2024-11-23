@@ -1,10 +1,12 @@
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/auth_screen/signup_screen.dart';
 import 'package:clockpath/views/onboarding_screen/widgets/onboarding_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -16,6 +18,19 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
+
+  Future<void> _checkTokenValidity() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('access_token');
+
+    if (token != null) {
+      // If the token exists and is not expired, navigate to MainScreen
+      Get.offAll(() => const LoginScreen());
+    } else {
+      // If the token is missing or expired, navigate to OnboardingScreen
+      Get.offAll(() => const SignupScreen());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,9 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 75.h,
             ),
             CustomButton(
-              onTap: () {
-                Get.offAll(() => const SignupScreen());
-              },
+              onTap: _checkTokenValidity,
               text: 'Get Started',
               decorationColor: GlobalColors.kDeepPurple,
               textColor: GlobalColors.textWhiteColor,
