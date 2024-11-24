@@ -6,9 +6,11 @@ import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -59,6 +61,9 @@ class _AllRequestState extends ConsumerState<AllRequest> {
         showError(
           res.message,
         );
+        if (res.message == 'Invalid or expired token. Please sign in again.') {
+          Get.offAll(() => const LoginScreen());
+        }
       }
     } catch (e) {
       log(e.toString());

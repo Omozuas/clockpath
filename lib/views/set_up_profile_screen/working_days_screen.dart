@@ -5,6 +5,7 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_dropdow.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/set_up_profile_screen/reminder_preference_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -108,6 +109,9 @@ class _WorkingDaysScreenState extends ConsumerState<WorkingDaysScreen> {
           res.message,
         );
         work.clear();
+        if (res.message == 'Invalid or expired token. Please sign in again.') {
+          Get.offAll(() => const LoginScreen());
+        }
       }
     } catch (e) {
       log(e.toString());

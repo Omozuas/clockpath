@@ -8,6 +8,7 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_bottomsheet.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/controller/main_controller/main_controller.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 // import 'package:clockpath/common/custom_bottomsheet.dart';
 // import 'package:clockpath/controller/main_controller/main_controller.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         showError(
           res.message,
         );
-        log('...noo');
+        if (res.message == 'Invalid or expired token. Please sign in again.') {
+          Get.offAll(() => const LoginScreen());
+        }
       }
     } catch (e) {
       log(e.toString());

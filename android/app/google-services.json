@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "352159932423",
+    "project_id": "sharepact-179d2",
+    "storage_bucket": "sharepact-179d2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352159932423:android:58a3905bd07af724f94aa2",
+        "android_client_info": {
+          "package_name": "com.clockpath.clock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVF0GHyOevJsvsKqllKAoyOub_xB5m4wk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352159932423:android:a5f8b46c38ca48b6f94aa2",
+        "android_client_info": {
+          "package_name": "com.sharepact.share"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVF0GHyOevJsvsKqllKAoyOub_xB5m4wk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

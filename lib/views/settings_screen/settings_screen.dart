@@ -46,6 +46,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         showError(
           res.message,
         );
+        if (res.message == 'Invalid or expired token. Please sign in again.') {
+          Get.offAll(() => const LoginScreen());
+        }
       }
     } catch (e) {
       log(e.toString());

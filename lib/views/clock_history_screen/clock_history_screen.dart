@@ -7,6 +7,7 @@ import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/clock_history_screen/result_history.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,6 +105,9 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
     if (res.status != 'success') {
       showError(res.message);
       log('showerr..2${res.message}');
+      if (res.message == 'Invalid or expired token. Please sign in again.') {
+        Get.offAll(() => const LoginScreen());
+      }
       return;
     }
     // Save all results for later filtering

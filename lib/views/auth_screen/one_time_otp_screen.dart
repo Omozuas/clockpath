@@ -5,6 +5,7 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/auth_screen/set_new_password.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -235,6 +236,9 @@ class _OneTimeOtpScreenState extends ConsumerState<OneTimeOtpScreen> {
         showError(
           res.message,
         );
+        if (res.message == 'Invalid or expired token. Please sign in again.') {
+          Get.offAll(() => const LoginScreen());
+        }
       }
     } catch (e) {
       log(e.toString());
