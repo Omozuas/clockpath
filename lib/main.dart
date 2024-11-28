@@ -1,5 +1,9 @@
+import 'package:clockpath/apis/services/push_notification.dart';
 import 'package:clockpath/color_theme/themes.dart';
+import 'package:clockpath/config/permission_handuler.dart';
+import 'package:clockpath/firebase_options.dart';
 import 'package:clockpath/views/splash_screen/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +12,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // Make app always in portrait
   SystemChrome.setPreferredOrientations(
     [
@@ -15,6 +22,11 @@ Future<void> main() async {
       DeviceOrientation.portraitDown,
     ],
   );
+  PushNotificationService pushNotificationService = PushNotificationService();
+  PermissionsMethods permissionsMethods = PermissionsMethods();
+  await permissionsMethods.askNotificationPermission();
+  pushNotificationService.initNotification();
+  pushNotificationService.generateDeviceToken();
   runApp(const ProviderScope(child: MyApp()));
 }
 

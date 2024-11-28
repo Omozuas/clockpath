@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:clockpath/apis/riverPod/auth_flow/auth_provider.dart';
+import 'package:clockpath/apis/services/push_notification.dart';
 import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
@@ -31,6 +32,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isButtonEnabled = false;
   bool _isPasswordObscured = true;
   String networkImg = '', fullName = '';
+  final PushNotificationService pushNotificationService =
+      PushNotificationService();
   @override
   void initState() {
     super.initState();
@@ -80,11 +83,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     log(".....start");
     final String email = _emailController.text;
     final String password = _passwordController.text;
+    final deviceToken = await pushNotificationService.generateDeviceToken();
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        await ref
-            .read(authProvider.notifier)
-            .login(email: email, password: password);
+        await ref.read(authProvider.notifier).login(
+            email: email, password: password, deviceToken: deviceToken ?? '');
         final res = ref.read(authProvider).loginRespons.value;
         if (res == null) return;
         if (res.status == "success") {

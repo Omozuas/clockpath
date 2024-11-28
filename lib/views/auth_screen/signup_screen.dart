@@ -5,6 +5,7 @@ import 'package:clockpath/color_theme/themes.dart';
 import 'package:clockpath/common/custom_button.dart';
 import 'package:clockpath/common/custom_textfield.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
+import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/success_screens/email_verified_success.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -163,6 +164,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         FilteringTextInputFormatter.deny(RegExp(r'\s')),
                         FilteringTextInputFormatter.deny(RegExp(r',')),
                       ],
+                      onForgotPassword: () {
+                        Get.to(() => const LoginScreen());
+                      },
+                      extraText: "Already have an account?",
                     ),
                     SizedBox(height: 80.h),
                     Align(

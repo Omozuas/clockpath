@@ -25,4 +25,12 @@ class PermissionsMethods {
       openAppSettings();
     }
   }
+
+  askNotificationPermission() async {
+    Permission.notification.isDenied.then((v) {
+      if (v) {
+        Permission.notification.request();
+      }
+    });
+  }
 }

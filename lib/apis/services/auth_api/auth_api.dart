@@ -43,11 +43,17 @@ class AuthServices {
   }
 
   Future<GeneralRespons> loginRespons(
-      {required String email, required String password}) async {
+      {required String email,
+      required String password,
+      required String deviceToken}) async {
     try {
       final response = await apiService.post(
         endpoint: ConnectionUrls.loginEndpoint,
-        body: {"email": email, "password": password},
+        body: {
+          "email": email,
+          "password": password,
+          "deviceToken": deviceToken
+        },
       );
       saveToken(response);
 

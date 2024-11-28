@@ -41,12 +41,15 @@ class AuthProvider extends AutoDisposeNotifier<AuthProviderStates> {
     }
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login(
+      {required String email,
+      required String password,
+      required String deviceToken}) async {
     final auth = ref.read(authServicesProvider);
     try {
       state = state.copyWith(loginRespons: const AsyncLoading());
-      final response =
-          await auth.loginRespons(email: email, password: password);
+      final response = await auth.loginRespons(
+          email: email, password: password, deviceToken: deviceToken);
       state = state.copyWith(loginRespons: AsyncData(response));
     } catch (e) {
       state = state.copyWith(
