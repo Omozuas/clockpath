@@ -164,9 +164,11 @@ class AuthServices {
     if (response!.success == false) return;
     final image = response.data["user"]["image"]["imageUrl"];
     final name = response.data["user"]["full_name"];
+    final role = response.data["user"]["role"];
     final preferences = await SharedPreferences.getInstance();
     preferences.setString('image', image);
     preferences.setString('name', name);
+    preferences.setString('role', role);
   }
 }
 

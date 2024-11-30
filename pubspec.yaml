@@ -53,6 +53,7 @@ dependencies:
   firebase_messaging: 
   firebase_core: 
   flutter_local_notifications: 
+  shimmer: ^3.0.0
   
 dev_dependencies:
   flutter_test:

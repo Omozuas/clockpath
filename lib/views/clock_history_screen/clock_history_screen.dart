@@ -6,6 +6,7 @@ import 'package:clockpath/apis/riverPod/get_recent_actibity/get_recent_activity.
 import 'package:clockpath/apis/riverPod/get_request/get_request.dart';
 import 'package:clockpath/apis/riverPod/get_workdays/get_workdays_provider.dart';
 import 'package:clockpath/color_theme/themes.dart';
+import 'package:clockpath/common/custom_popup.dart';
 import 'package:clockpath/common/snackbar/custom_snack_bar.dart';
 import 'package:clockpath/views/auth_screen/login_screen.dart';
 import 'package:clockpath/views/clock_history_screen/result_history.dart';
@@ -17,6 +18,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ClockHistoryScreen extends ConsumerStatefulWidget {
   const ClockHistoryScreen({super.key});
@@ -98,22 +100,28 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
   Future<void> getRecentResults() async {
     log('showerr......');
     await ref.read(getRecentActivityProvider.notifier).getRecentResults();
-    final res = ref.watch(getRecentActivityProvider).value;
-    log('showerr..1${res?.message}');
-    if (res == null) return;
+    if (mounted) {
+      final res = ref.read(getRecentActivityProvider).value;
+      log('showerr..1${res?.message}');
+      if (res == null) return;
 
-    if (res.status != 'success') {
-      showError(res.message);
-      log('showerr..2${res.message}');
-      if (res.message == 'Invalid or expired token. Please sign in again.') {
-        Get.offAll(() => const LoginScreen());
+      if (res.status != 'success') {
+        showError(res.message);
+        log('showerr..2${res.message}');
+        if (res.message == 'Invalid or expired token. Please sign in again.') {
+          Get.offAll(() => const LoginScreen());
+        } else if (res.message == 'No Internet connection') {
+          load();
+        } else if (res.message == 'Request Timeout') {
+          load1();
+        }
+        return;
       }
-      return;
+      // Save all results for later filtering
+      setState(() {
+        allResults = res.data?.results;
+      });
     }
-    // Save all results for later filtering
-    setState(() {
-      allResults = res.data?.results;
-    });
   }
 
   List<Result> getFilteredResults() {
@@ -442,9 +450,178 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
                         );
                       },
                       error: (e, s) {
-                        return Text('$e,$s');
+                        return Shimmer.fromColors(
+                            baseColor: GlobalColors.kLightpPurple,
+                            highlightColor:
+                                GlobalColors.kLightpPurple.withOpacity(0.1),
+                            child: ListView.builder(
+                                itemCount: 3,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: GlobalColors.backgroundColor2,
+                                    ),
+                                    height: 37.h,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                          bottom: 0, top: 10.dg),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 20.w, right: 20.w),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'item.date ',
+                                                    textAlign: TextAlign.start,
+                                                    softWrap: true,
+                                                    style: GoogleFonts.openSans(
+                                                      color: GlobalColors
+                                                          .textblackBoldColor,
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    'item.clockInTime',
+                                                    textAlign: TextAlign.center,
+                                                    softWrap: true,
+                                                    style: GoogleFonts.openSans(
+                                                      color: GlobalColors
+                                                          .textblackBoldColor,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    'item.clockOutTime ',
+                                                    textAlign: TextAlign.end,
+                                                    softWrap: true,
+                                                    style: GoogleFonts.openSans(
+                                                      color: GlobalColors
+                                                          .textblackBoldColor,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Divider(
+                                            height:
+                                                1.h, // Responsive divider width
+                                            indent: 30.h, // Responsive indent
+                                            endIndent:
+                                                30.h, // Responsive end indent
+                                            color: GlobalColors.lightGrayeColor,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }));
                       },
-                      loading: () => const Text('..loading')),
+                      loading: () => Shimmer.fromColors(
+                          baseColor: GlobalColors.kLightpPurple,
+                          highlightColor:
+                              GlobalColors.kLightpPurple.withOpacity(0.1),
+                          child: ListView.builder(
+                              itemCount: 3,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: GlobalColors.backgroundColor2,
+                                  ),
+                                  height: 37.h,
+                                  child: Padding(
+                                    padding:
+                                        EdgeInsets.only(bottom: 0, top: 10.dg),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 20.w, right: 20.w),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'item.date ',
+                                                  textAlign: TextAlign.start,
+                                                  softWrap: true,
+                                                  style: GoogleFonts.openSans(
+                                                    color: GlobalColors
+                                                        .textblackBoldColor,
+                                                    fontSize: 12.sp,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'item.clockInTime',
+                                                  textAlign: TextAlign.center,
+                                                  softWrap: true,
+                                                  style: GoogleFonts.openSans(
+                                                    color: GlobalColors
+                                                        .textblackBoldColor,
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'item.clockOutTime ',
+                                                  textAlign: TextAlign.end,
+                                                  softWrap: true,
+                                                  style: GoogleFonts.openSans(
+                                                    color: GlobalColors
+                                                        .textblackBoldColor,
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Divider(
+                                          height:
+                                              1.h, // Responsive divider width
+                                          indent: 30.h, // Responsive indent
+                                          endIndent:
+                                              30.h, // Responsive end indent
+                                          color: GlobalColors.lightGrayeColor,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }))),
                 ],
               ),
             ),
@@ -466,5 +643,37 @@ class _ClockHistoryScreenState extends ConsumerState<ClockHistoryScreen> {
         ),
       );
     }).toList();
+  }
+
+  void load() {
+    showCustomPopup(
+        context: context,
+        boxh: 220.h,
+        boxw: 254.w,
+        decorationColor: GlobalColors.kDeepPurple,
+        firstText: 'No Internet connection',
+        secondText: 'Reload',
+        proceed: () {
+          Get.back();
+          reloade();
+        });
+  }
+
+  void load1() {
+    showCustomPopup(
+        context: context,
+        boxh: 220.h,
+        boxw: 254.w,
+        decorationColor: GlobalColors.kDeepPurple,
+        firstText: 'Request Timeout',
+        secondText: 'Reload',
+        proceed: () {
+          Get.back();
+          reloade();
+        });
+  }
+
+  void reloade() {
+    getRecentResults();
   }
 }

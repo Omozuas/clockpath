@@ -37,7 +37,7 @@ class PushNotificationService {
     log('handleMessage');
     log('data ${message?.data}');
     log('notifytit ${message?.notification?.title}');
-    log('notifybodyt ${message?.notification?.body}');
+    log('notifybody ${message?.notification?.body}');
     if (message == null) return;
 
     // var data = jsonDecode(message.notification?.body ?? '{}');

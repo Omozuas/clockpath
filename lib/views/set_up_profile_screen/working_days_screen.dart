@@ -125,14 +125,14 @@ class _WorkingDaysScreenState extends ConsumerState<WorkingDaysScreen> {
 
   List<String> generateTimeList() {
     List<String> timeList = [];
-    DateTime startTime = DateTime(0, 1, 1, 6, 0); // Start at 06:00
+    DateTime startTime = DateTime(0, 1, 1, 0, 0); // Start at 06:00
     DateTime endTime = DateTime(0, 1, 1, 23, 59); // End at 23:59
     final DateFormat timeFormat = DateFormat("HH:mm"); // 24-hour format
 
     while (startTime.isBefore(endTime)) {
       timeList.add(timeFormat.format(startTime));
       startTime =
-          startTime.add(const Duration(minutes: 30)); // Increment by 30 minutes
+          startTime.add(const Duration(minutes: 1)); // Increment by 30 minutes
     }
 
     return timeList;

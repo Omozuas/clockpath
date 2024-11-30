@@ -36,7 +36,7 @@ class _ReminderPreferenceScreenState
   List<String> generateTimeIntervals() {
     List<String> intervals = [];
     for (int hour = 6; hour < 24; hour++) {
-      for (int minute = 0; minute < 60; minute += 10) {
+      for (int minute = 0; minute < 60; minute += 1) {
         final formattedTime =
             "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
         intervals.add(formattedTime);

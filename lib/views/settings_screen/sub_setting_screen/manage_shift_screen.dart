@@ -123,14 +123,14 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
 
   List<String> generateTimeList() {
     List<String> timeList = [];
-    DateTime startTime = DateTime(0, 1, 1, 6, 0); // Start at 06:00
+    DateTime startTime = DateTime(0, 1, 1, 0, 0); // Start at 06:00
     DateTime endTime = DateTime(0, 1, 1, 23, 59); // End at 23:59
     final DateFormat timeFormat = DateFormat("HH:mm"); // 24-hour format
 
     while (startTime.isBefore(endTime)) {
       timeList.add(timeFormat.format(startTime));
       startTime =
-          startTime.add(const Duration(minutes: 30)); // Increment by 30 minutes
+          startTime.add(const Duration(minutes: 1)); // Increment by 30 minutes
     }
 
     return timeList;
@@ -144,6 +144,8 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
     Future.microtask(() => getWorkingDays());
   }
 
+  List<Map<String, String>> workDayList = [];
+
   void getWorkingDays() async {
     try {
       await ref.read(getWorkDaysProvider.notifier).getWorkDays();
@@ -151,34 +153,48 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
       if (res == null) return;
       if (res.status == "success") {
         res.data?.data?.workDays?.forEach((workDay) {
+          String formatTime(String time) {
+            // Remove AM/PM
+            time = time.replaceAll(RegExp(r'AM|PM'), '').trim();
+            // Split into hour and minute
+            List<String> parts = time.split(':');
+            if (parts.length == 2) {
+              // Pad single-digit hour with a leading zero
+              parts[0] = parts[0].padLeft(2, '0');
+              return '${parts[0]}:${parts[1]}';
+            }
+            return time; // Return as-is if invalid format
+          }
+
           switch (workDay.day) {
             case 'Monday':
-              mondayStart = workDay.shift?.start ?? '';
-              mondayEnd = workDay.shift?.end ?? '';
+              mondayStart = formatTime(workDay.shift?.start ?? '');
+              mondayEnd = formatTime(workDay.shift?.end ?? '');
+
               break;
             case 'Tuesday':
-              tuesdayStart = workDay.shift?.start ?? '';
-              tuesdayEnd = workDay.shift?.end ?? '';
+              tuesdayStart = formatTime(workDay.shift?.start ?? '');
+              tuesdayEnd = formatTime(workDay.shift?.end ?? '');
               break;
             case 'Wednesday':
-              wednessadyStart = workDay.shift?.start ?? '';
-              wednessadyEnd = workDay.shift?.end ?? '';
+              wednessadyStart = formatTime(workDay.shift?.start ?? '');
+              wednessadyEnd = formatTime(workDay.shift?.end ?? '');
               break;
             case 'Thursday':
-              thursdayStart = workDay.shift?.start ?? '';
-              thursdayEnd = workDay.shift?.end ?? '';
+              thursdayStart = formatTime(workDay.shift?.start ?? '');
+              thursdayEnd = formatTime(workDay.shift?.end ?? '');
               break;
             case 'Friday':
-              fridayStart = workDay.shift?.start ?? '';
-              fridayEnd = workDay.shift?.end ?? '';
+              fridayStart = formatTime(workDay.shift?.start ?? '');
+              fridayEnd = formatTime(workDay.shift?.end ?? '');
               break;
             case 'Saturday':
-              saturdayStart = workDay.shift?.start ?? '';
-              saturdayEnd = workDay.shift?.end ?? '';
+              saturdayStart = formatTime(workDay.shift?.start ?? '');
+              saturdayEnd = formatTime(workDay.shift?.end ?? '');
               break;
             case 'Sunday':
-              sundayStart = workDay.shift?.start ?? '';
-              sundayEnd = workDay.shift?.end ?? '';
+              sundayStart = formatTime(workDay.shift?.start ?? '');
+              sundayEnd = formatTime(workDay.shift?.end ?? '');
               break;
           }
         });
@@ -203,7 +219,7 @@ class _ManageShiftScreenState extends ConsumerState<ManageShiftScreen> {
   Widget build(BuildContext context) {
     final isLoading = ref.watch(setupProfileProvider).setupWorkDays.isLoading;
     ref.watch(getWorkDaysProvider);
-
+    log('mondayStart $tuesdayStart mondayEnd: $tuesdayEnd');
     return Scaffold(
       backgroundColor: GlobalColors.backgroundColor1,
       body: SafeArea(

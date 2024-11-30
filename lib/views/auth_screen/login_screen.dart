@@ -84,7 +84,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final String email = _emailController.text;
     final String password = _passwordController.text;
     final deviceToken = await pushNotificationService.generateDeviceToken();
+
     if (_formKey.currentState?.validate() ?? false) {
+      log('my device $deviceToken');
       try {
         await ref.read(authProvider.notifier).login(
             email: email, password: password, deviceToken: deviceToken ?? '');
@@ -95,6 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             res.message,
           );
           getImge();
+          log('my device $deviceToken');
         } else {
           log(res.message);
           showError(

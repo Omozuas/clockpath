@@ -68,7 +68,10 @@ class _RequestsScreenState extends ConsumerState<RequestsScreen>
               child: Column(
                 children: [
                   TabBar(
+                    tabAlignment: TabAlignment.center,
+                    indicatorSize: TabBarIndicatorSize.label,
                     dividerColor: Colors.transparent,
+                    labelPadding: EdgeInsets.only(left: 20.w, right: 20.w),
                     labelStyle: GoogleFonts.openSans(
                       color: GlobalColors.textblackBoldColor,
                       fontSize: 14.sp,
